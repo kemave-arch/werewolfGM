@@ -1,0 +1,2591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Grimoire - Werewolf GM Grimoire</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Three.js for 3D Floating Particle Motes -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@500;700;900&family=MedievalSharp&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            gothic: ['"Cinzel Decorative"', 'serif'],
+            cinzel: ['Cinzel', 'serif'],
+            medieval: ['MedievalSharp', 'cursive'],
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+          },
+          colors: {
+            obsidian: {
+              950: '#030508',
+              900: '#070b12',
+              850: '#0c121e',
+              800: '#111a2c',
+              700: '#1b273f'
+            },
+            silver: {
+              100: '#f8fafc',
+              200: '#e2e8f0',
+              300: '#cbd5e1',
+              400: '#94a3b8',
+              500: '#64748b'
+            },
+            ether: {
+              cyan: '#06b6d4',
+              glow: '#22d3ee',
+              purple: '#a855f7',
+              deepPurple: '#6b21a8'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      background-color: #030508;
+    }
+    #three-bg-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 1;
+      pointer-events: none;
+    }
+    /* Artwork Background container */
+    .paskong-artwork-bg {
+      background-image: 
+        linear-gradient(180deg, rgba(3, 5, 8, 0.45) 0%, rgba(3, 5, 8, 0.15) 35%, rgba(3, 5, 8, 0.7) 75%, rgba(3, 5, 8, 0.95) 100%),
+        url('Werewolf%20GPT.png');
+      background-size: cover;
+      background-position: center top;
+      background-repeat: no-repeat;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: rgba(148, 163, 184, 0.25);
+      border-radius: 4px;
+    }
+    .glass-card {
+      background: rgba(11, 18, 30, 0.72);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(226, 232, 240, 0.14);
+      box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.7);
+    }
+    .glow-cyan {
+      box-shadow: 0 0 25px rgba(6, 182, 212, 0.35);
+    }
+    .glow-purple {
+      box-shadow: 0 0 25px rgba(168, 85, 247, 0.35);
+    }
+    .text-glow {
+      text-shadow: 0 0 16px rgba(34, 211, 238, 0.5);
+    }
+  </style>
+</head>
+<body class="text-silver-200 font-sans min-h-screen flex flex-col antialiased relative overflow-x-hidden">
+
+  <!-- Three.js Floating Ambient Particle Motes Canvas -->
+  <canvas id="three-bg-canvas"></canvas>
+
+  <!-- ================= SCREEN 0: CINEMATIC TITLE SCREEN ================= -->
+  <section id="screenTitle" class="relative z-10 min-h-screen paskong-artwork-bg flex flex-col items-center justify-between p-5 text-center transition-opacity duration-500">
+    <!-- Top Bar Framing the Moon -->
+    <div class="pt-6 space-y-2">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-ether-cyan/40 bg-obsidian-950/80 backdrop-blur text-[10px] uppercase font-bold tracking-widest text-ether-cyan shadow-lg">
+        <span>🎄</span> <span>Paskong Pinoy Grimoire</span>
+      </div>
+      <h1 class="font-gothic text-3xl sm:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-b from-silver-100 via-ether-glow to-ether-purple tracking-wider drop-shadow-lg text-glow">
+        WEREWOLF
+      </h1>
+      <p class="font-cinzel text-xs text-silver-300 tracking-widest uppercase font-semibold">
+        Sanctum of the Bloodmoon
+      </p>
+    </div>
+
+    <!-- Center View Area (Clear View of the Illustrated Village & Council) -->
+    <div class="w-full max-w-xs flex flex-col items-center justify-center my-auto py-8">
+      <div class="px-4 py-2 rounded-2xl bg-obsidian-950/50 backdrop-blur-md border border-silver-400/20 shadow-2xl flex items-center gap-2 animate-pulse">
+        <span class="w-2 h-2 rounded-full bg-ether-cyan shadow-lg shadow-cyan-400/80"></span>
+        <span class="font-cinzel text-[11px] text-silver-200 tracking-wider">12 Souls Gathering Tonight</span>
+      </div>
+    </div>
+
+    <!-- Bottom Action Button Over the Hero Silhouettes -->
+    <div class="w-full max-w-xs space-y-3 pb-6">
+      <button onclick="enterMainMenu()" class="w-full bg-gradient-to-r from-obsidian-900/90 via-slate-900/90 to-obsidian-900/90 hover:opacity-95 text-silver-100 font-cinzel font-bold text-sm py-4 rounded-2xl shadow-2xl active:scale-95 transition-all flex items-center justify-center gap-2 border border-ether-cyan/60 glow-cyan backdrop-blur-lg">
+        <i data-lucide="sparkles" class="w-4 h-4 text-ether-glow"></i>
+        <span>ENTER THE COVEN</span>
+      </button>
+      <p class="text-[10px] text-silver-400 font-medieval tracking-wide">
+        Charles • Judy • Paul • Hannah • Charade • Joyjoy & Pack
+      </p>
+    </div>
+  </section>
+
+  <!-- ================= SCREEN 1: SESSIONS MANAGER ================= -->
+  <section id="screenMenu" class="hidden relative z-10 min-h-screen paskong-artwork-bg flex flex-col p-4 max-w-md mx-auto w-full transition-opacity duration-500">
+    <!-- Header -->
+    <div class="flex items-center justify-between border-b border-silver-400/20 pb-3 mb-4 bg-obsidian-950/60 p-3 rounded-2xl backdrop-blur-md border">
+      <div>
+        <h2 class="font-gothic text-base text-silver-100 font-bold tracking-wide">VILLAGE CHRONICLES</h2>
+        <p class="text-[10px] text-silver-400">Select or forge an active session</p>
+      </div>
+      <button onclick="showTitleScreen()" class="p-2 rounded-xl bg-obsidian-800/90 text-silver-400 hover:text-white active:scale-90 border border-silver-400/20">
+        <i data-lucide="log-out" class="w-4 h-4"></i>
+      </button>
+    </div>
+
+    <!-- Create Session Card -->
+    <div class="glass-card rounded-2xl p-4 mb-4 border border-ether-cyan/40 shadow-xl space-y-2.5">
+      <div class="flex items-center justify-between">
+        <span class="text-xs font-cinzel font-bold text-ether-cyan flex items-center gap-1.5">
+          <i data-lucide="plus-circle" class="w-3.5 h-3.5 text-ether-glow"></i>
+          <span>Forge New Session</span>
+        </span>
+      </div>
+      <div class="flex gap-2">
+        <input id="sessionTitleInput" type="text" placeholder="e.g. Christmas Eve Gathering..." 
+          class="flex-1 bg-obsidian-950/90 border border-silver-400/20 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-ether-cyan">
+        <button onclick="createNewSession()" class="bg-gradient-to-r from-cyan-600 to-purple-600 hover:opacity-95 text-white font-bold text-xs px-3.5 py-2 rounded-xl active:scale-95 transition-transform flex items-center gap-1 shadow">
+          <span>Forge</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Sessions List -->
+    <div class="flex-1 space-y-2.5 overflow-y-auto custom-scrollbar pb-6" id="sessionsListContainer">
+      <!-- Populated by JS -->
+    </div>
+  </section>
+
+  <!-- ================= ACTIVE GAME SESSION HUD & MAIN CONTENT ================= -->
+  <div id="activeGameWrapper" class="hidden relative z-10 min-h-screen flex flex-col bg-obsidian-950/90">
+    <!-- Header HUD -->
+    <header class="sticky top-0 z-30 bg-obsidian-950/95 backdrop-blur-md border-b border-silver-400/15 px-3.5 py-2 flex items-center justify-between shadow-xl">
+      <div class="flex items-center gap-2">
+        <button onclick="returnToMainMenu()" title="Back to Sessions" class="w-8 h-8 rounded-xl bg-obsidian-800 border border-silver-400/20 flex items-center justify-center text-silver-300 active:scale-90">
+          <i data-lucide="menu" class="w-4 h-4"></i>
+        </button>
+        <div>
+          <div class="flex items-center gap-1.5">
+            <h1 class="font-cinzel text-xs font-black tracking-wider text-silver-100 truncate max-w-[130px]" id="hudSessionTitle">
+              Session
+            </h1>
+            <span id="hudPhaseBadge" class="text-[9px] px-1.5 py-0.2 rounded bg-ether-cyan/20 text-ether-cyan font-sans uppercase font-bold border border-ether-cyan/40">
+              Setup
+            </span>
+          </div>
+          <p class="text-[9px] text-ether-purple font-medium tracking-wide">Paskong Pinoy App</p>
+        </div>
+      </div>
+
+      <!-- Quick Audio & Guide -->
+      <div class="flex items-center gap-1.5">
+        <button onclick="SoundEngine.howl()" title="Wolf Howl" class="p-2 rounded-lg bg-obsidian-850 active:scale-90 border border-silver-400/20 text-ether-purple shadow">
+          <i data-lucide="moon" class="w-4 h-4"></i>
+        </button>
+        <button onclick="SoundEngine.bell()" title="Bell" class="p-2 rounded-lg bg-obsidian-850 active:scale-90 border border-silver-400/20 text-ether-cyan shadow">
+          <i data-lucide="bell" class="w-4 h-4"></i>
+        </button>
+        <button onclick="openModal('quickHelpModal')" title="Role Help" class="p-2 rounded-lg bg-obsidian-850 active:scale-90 border border-silver-400/20 text-silver-300 shadow">
+          <i data-lucide="help-circle" class="w-4 h-4"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Active Viewport -->
+    <main class="flex-1 overflow-y-auto px-3.5 py-3 max-w-md mx-auto w-full pb-20" id="gameViewContainer">
+
+      <!-- ================= PHASE 1: SETUP & 12-PLAYER PRESET ================= -->
+      <section id="subviewSetup" class="space-y-3.5">
+        <!-- Preset / Catalog Bar -->
+        <div class="glass-card rounded-2xl p-2.5 shadow-lg flex items-center justify-between border-ether-cyan/20">
+          <div class="truncate mr-2">
+            <div class="text-[9px] uppercase font-bold tracking-wider text-ether-cyan font-cinzel">Current Card Deck</div>
+            <div class="text-xs text-silver-100 font-semibold truncate" id="currentPresetName">12-Player Gathering</div>
+          </div>
+          <div class="flex items-center gap-1.5 flex-shrink-0">
+            <button onclick="openModal('presetSelectModal')" class="bg-obsidian-800 hover:bg-obsidian-700 text-silver-200 p-2 rounded-xl border border-silver-400/20 active:scale-95 flex items-center gap-1 text-xs">
+              <i data-lucide="layers" class="w-3.5 h-3.5 text-ether-cyan"></i>
+              <span class="text-[11px] font-medium">Presets</span>
+            </button>
+            <button onclick="openRoleManagerModal()" class="bg-ether-purple/80 hover:bg-ether-purple text-white p-2 rounded-xl active:scale-95 shadow flex items-center gap-1 text-xs">
+              <i data-lucide="sliders" class="w-3.5 h-3.5"></i>
+              <span class="text-[11px] font-bold">Roles</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Players Roster (With Custom 12-Player Button) -->
+        <div class="glass-card rounded-2xl p-3 shadow-xl space-y-2">
+          <div class="flex justify-between items-center">
+            <h2 class="font-cinzel text-xs font-bold text-silver-100 flex items-center gap-1.5">
+              <i data-lucide="users" class="w-3.5 h-3.5 text-ether-cyan"></i>
+              <span>Players (<span id="playerCount">0</span>)</span>
+            </h2>
+            <button onclick="quickAddYourTwelvePlayers()" class="text-[11px] text-ether-glow hover:underline font-semibold flex items-center gap-1">
+              <i data-lucide="user-plus" class="w-3 h-3"></i>
+              <span>+12 Presets</span>
+            </button>
+          </div>
+
+          <div class="flex gap-1.5">
+            <input id="newPlayerName" type="text" placeholder="Add custom player..." 
+              class="flex-1 bg-obsidian-950/90 border border-silver-400/20 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-ether-cyan"
+              onkeydown="if(event.key==='Enter') addPlayer()">
+            <button onclick="addPlayer()" class="bg-gradient-to-r from-cyan-600 to-purple-600 hover:opacity-95 text-white px-3 py-2 rounded-xl active:scale-95 transition-transform shadow flex items-center justify-center">
+              <i data-lucide="plus" class="w-4 h-4"></i>
+            </button>
+          </div>
+
+          <div id="playerChipsContainer" class="flex flex-wrap gap-1.5 max-h-40 overflow-y-auto custom-scrollbar pt-1">
+            <!-- Injected by JS -->
+          </div>
+        </div>
+
+        <!-- Role Quantities -->
+        <div class="glass-card rounded-2xl p-3 shadow-xl space-y-2.5">
+          <div class="flex justify-between items-center">
+            <h2 class="font-cinzel text-xs font-bold text-silver-100 flex items-center gap-1.5">
+              <i data-lucide="sparkles" class="w-3.5 h-3.5 text-ether-purple"></i>
+              <span>Deck Quantities</span>
+            </h2>
+            <span id="roleCountMatch" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-800 text-silver-300 border border-silver-400/20">
+              0 / 0
+            </span>
+          </div>
+          <div class="grid grid-cols-2 gap-1.5 text-xs" id="rolesSelectorGrid">
+            <!-- Injected by JS -->
+          </div>
+        </div>
+
+        <!-- Custom Order Button -->
+        <button onclick="openOrderManagerModal()" class="w-full bg-obsidian-800 border border-silver-400/20 hover:bg-obsidian-700 text-silver-200 text-xs font-cinzel font-bold py-2.5 rounded-xl active:scale-95 flex items-center justify-center gap-1.5 shadow">
+          <i data-lucide="arrow-up-down" class="w-3.5 h-3.5 text-ether-cyan"></i>
+          <span>Customize Night Sequence</span>
+        </button>
+
+        <!-- Start CTA -->
+        <button onclick="startGame()" id="btnStartGame" class="w-full bg-gradient-to-r from-cyan-600 via-purple-600 to-cyan-600 hover:opacity-95 text-white font-cinzel font-bold text-xs py-3.5 rounded-2xl shadow-2xl active:scale-98 transition-all flex items-center justify-center gap-1.5 glow-cyan">
+          <i data-lucide="moon" class="w-4 h-4 text-ether-glow"></i>
+          <span>COMMENCE NIGHT 1</span>
+        </button>
+      </section>
+
+      <!-- ================= PHASE 2: NIGHT FLOW WITH TARGETING ================= -->
+      <section id="subviewNight" class="hidden space-y-3">
+        <div class="glass-card bg-gradient-to-r from-obsidian-950 via-obsidian-900 to-obsidian-850 border border-ether-cyan/30 rounded-2xl p-3 text-center relative overflow-hidden shadow-xl">
+          <div class="text-[9px] uppercase tracking-widest text-ether-cyan font-bold font-cinzel mb-0.5" id="nightSubheader">Night 1</div>
+          <h2 class="font-gothic text-base font-black text-white tracking-wide">The Village Sleeps</h2>
+          <p class="text-[11px] text-silver-400 font-medieval italic">"Close your eyes, villagers of the realm..."</p>
+        </div>
+
+        <!-- Stepper Indicators -->
+        <div class="flex items-center justify-between text-[10px] font-semibold text-silver-400 px-1">
+          <div class="flex items-center gap-1">
+            <span>Turn <span id="nightStepIndex">1</span>/<span id="nightTotalSteps">5</span></span>
+            <span class="text-ether-cyan font-bold">•</span>
+            <span id="nightStepTitle" class="text-ether-glow font-bold font-cinzel">Seer</span>
+          </div>
+          <button onclick="openOrderManagerModal()" class="text-ether-cyan hover:underline text-[10px] flex items-center gap-0.5">
+            <i data-lucide="sliders-horizontal" class="w-3 h-3"></i>
+            <span>Re-order</span>
+          </button>
+        </div>
+
+        <!-- Active Targeting Card -->
+        <div id="nightStepCard" class="glass-card rounded-2xl p-3.5 shadow-2xl space-y-3 min-h-[310px] flex flex-col justify-between border-silver-400/20">
+          <!-- Dynamic Step Content -->
+        </div>
+
+        <!-- Prev / Next Navigation -->
+        <div class="grid grid-cols-2 gap-2 pt-0.5">
+          <button onclick="prevNightStep()" id="btnPrevNight" class="py-2.5 px-3 rounded-xl bg-obsidian-800 hover:bg-obsidian-700 text-silver-300 font-semibold text-xs active:scale-95 shadow flex items-center justify-center gap-1 border border-silver-400/15">
+            <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
+            <span>Previous</span>
+          </button>
+          <button onclick="nextNightStep()" id="btnNextNight" class="py-2.5 px-3 rounded-xl bg-gradient-to-r from-cyan-600 to-purple-600 hover:opacity-95 text-white font-bold text-xs shadow-lg active:scale-95 flex items-center justify-center gap-1">
+            <span>Next Action</span>
+            <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+          </button>
+        </div>
+      </section>
+
+      <!-- ================= PHASE 3: DAWN CASUALTY REPORT ================= -->
+      <section id="subviewDawn" class="hidden space-y-3">
+        <div class="glass-card bg-gradient-to-r from-obsidian-900 via-obsidian-850 to-slate-900 border border-ether-purple/30 rounded-2xl p-3 text-center shadow-lg">
+          <div class="text-2xl mb-0.5">🌅</div>
+          <h2 class="font-gothic text-base font-black text-silver-100">Dawn Proclamation</h2>
+          <p class="text-[11px] text-silver-400 font-medieval">Night results calculated and logged.</p>
+        </div>
+
+        <div class="glass-card rounded-2xl p-3 space-y-2.5 shadow-xl border-silver-400/15">
+          <h3 class="text-[10px] uppercase font-bold tracking-wider text-ether-cyan font-cinzel">Casualties & Wards</h3>
+          <div id="dawnCasualtyReport" class="space-y-1.5 text-xs">
+            <!-- Populated dynamically -->
+          </div>
+          
+          <div class="pt-2 border-t border-silver-400/15 space-y-1">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] font-cinzel font-bold text-ether-purple uppercase">Narration Script:</span>
+              <button onclick="copyNarration()" class="text-[10px] text-silver-400 hover:text-white flex items-center gap-0.5">
+                <i data-lucide="copy" class="w-3 h-3"></i>
+                <span>Copy</span>
+              </button>
+            </div>
+            <div id="gmAnnouncementScript" class="text-xs text-silver-300 font-medieval bg-obsidian-950/80 p-2.5 rounded-xl border border-silver-400/10 leading-relaxed">
+              <!-- Script text -->
+            </div>
+          </div>
+        </div>
+
+        <button onclick="proceedToDay()" class="w-full bg-gradient-to-r from-cyan-600 via-purple-600 to-cyan-600 hover:opacity-95 text-white font-cinzel font-black py-3 rounded-2xl shadow-xl active:scale-98 transition-all flex items-center justify-center gap-1.5 text-xs glow-cyan">
+          <i data-lucide="sun" class="w-4 h-4"></i>
+          <span>WAKE VILLAGE (TOWN HALL)</span>
+        </button>
+      </section>
+
+      <!-- ================= PHASE 4: DAY DISCUSSION & LYNCH ================= -->
+      <section id="subviewDay" class="hidden space-y-3">
+        <!-- Timer -->
+        <div class="glass-card rounded-2xl p-3 shadow-xl border-silver-400/15">
+          <div class="flex items-center justify-between mb-2">
+            <div>
+              <span class="text-[9px] uppercase font-bold text-ether-cyan tracking-wider font-cinzel" id="dayNumberLabel">Day 1</span>
+              <h2 class="font-gothic text-xs font-bold text-white">Village Council</h2>
+            </div>
+            <div id="timerDisplay" class="font-mono text-2xl font-black text-silver-100 tracking-wider">03:00</div>
+          </div>
+
+          <div class="flex gap-1.5">
+            <button onclick="toggleTimer()" id="btnTimerToggle" class="flex-1 bg-gradient-to-r from-cyan-600 to-purple-600 hover:opacity-95 text-white text-xs font-bold py-2 rounded-xl active:scale-95 shadow flex items-center justify-center gap-1">
+              <i data-lucide="play" id="timerIcon" class="w-3.5 h-3.5"></i>
+              <span id="timerBtnText">Start Timer</span>
+            </button>
+            <button onclick="addTimerSeconds(60)" class="px-3 bg-obsidian-800 hover:bg-obsidian-700 text-silver-200 text-xs font-semibold py-2 rounded-xl active:scale-95 flex items-center gap-0.5 border border-silver-400/15">
+              <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+              <span>1m</span>
+            </button>
+            <button onclick="resetTimer()" class="px-3 bg-obsidian-800 hover:bg-obsidian-700 text-silver-300 py-2 rounded-xl active:scale-95 border border-silver-400/15">
+              <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Execution Verdict Tool -->
+        <div class="glass-card rounded-2xl p-3 shadow-xl space-y-2.5 border-silver-400/15">
+          <div class="flex justify-between items-center">
+            <h3 class="font-cinzel text-xs font-bold text-silver-100 flex items-center gap-1.5">
+              <i data-lucide="scale" class="w-3.5 h-3.5 text-ether-purple"></i>
+              <span>Execution Verdict</span>
+            </h3>
+            <span class="text-[10px] text-silver-400 font-medium">Select accused</span>
+          </div>
+
+          <div id="livingVoteList" class="grid grid-cols-2 gap-1.5 max-h-48 overflow-y-auto custom-scrollbar p-0.5">
+            <!-- Living players -->
+          </div>
+
+          <div class="flex gap-1.5 pt-1">
+            <button onclick="executeSelectedLynch()" id="btnConfirmLynch" disabled class="flex-1 bg-gradient-to-r from-purple-700 to-rose-700 disabled:opacity-40 hover:opacity-95 text-white font-bold text-xs py-2.5 rounded-xl active:scale-95 transition-all shadow flex items-center justify-center gap-1 border border-purple-500/30">
+              <i data-lucide="skull" class="w-3.5 h-3.5"></i>
+              <span>Execute</span>
+            </button>
+            <button onclick="skipDayLynch()" class="px-3 bg-obsidian-800 hover:bg-obsidian-700 text-silver-300 font-semibold text-xs rounded-xl active:scale-95 flex items-center gap-1 border border-silver-400/15">
+              <i data-lucide="skip-forward" class="w-3.5 h-3.5"></i>
+              <span>Pardon</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= PHASE 5: MASTER ROSTER & LOG ================= -->
+      <section id="subviewRoster" class="hidden space-y-3">
+        <div class="glass-card rounded-2xl p-3 shadow-xl space-y-2 border-silver-400/15">
+          <div class="flex justify-between items-center">
+            <h2 class="font-cinzel text-xs font-bold text-silver-100 flex items-center gap-1.5">
+              <i data-lucide="scroll" class="w-3.5 h-3.5 text-ether-cyan"></i>
+              <span>Living Souls</span>
+            </h2>
+            <span class="text-[10px] text-ether-glow font-medium" id="rosterFactionRatio">--</span>
+          </div>
+
+          <div id="fullRosterList" class="space-y-1.5 max-h-60 overflow-y-auto custom-scrollbar pr-0.5">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+
+        <div class="glass-card rounded-2xl p-3 shadow-xl space-y-1.5 border-silver-400/15">
+          <h3 class="font-cinzel text-[10px] font-bold text-silver-300 uppercase tracking-wider">Chronicles & Target Log</h3>
+          <div id="gameLogContainer" class="space-y-1 text-[11px] text-silver-400 max-h-40 overflow-y-auto custom-scrollbar font-mono">
+            <p class="text-slate-500 italic">No historical events recorded.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="fixed bottom-0 left-0 right-0 z-30 bg-obsidian-950/95 backdrop-blur-lg border-t border-silver-400/15 px-2 py-1.5 shadow-2xl">
+      <div class="max-w-md mx-auto flex justify-around items-center text-[10px] font-semibold text-silver-400">
+        <button onclick="switchTab('setup')" id="tabSetup" class="flex flex-col items-center gap-0.5 py-1 px-3 rounded-xl text-ether-cyan font-bold transition-colors">
+          <i data-lucide="settings" class="w-4 h-4"></i>
+          <span>Setup</span>
+        </button>
+        <button onclick="switchTab('night')" id="tabNight" class="flex flex-col items-center gap-0.5 py-1 px-3 rounded-xl transition-colors">
+          <i data-lucide="moon" class="w-4 h-4"></i>
+          <span>Night</span>
+        </button>
+        <button onclick="switchTab('day')" id="tabDay" class="flex flex-col items-center gap-0.5 py-1 px-3 rounded-xl transition-colors">
+          <i data-lucide="sun" class="w-4 h-4"></i>
+          <span>Day</span>
+        </button>
+        <button onclick="switchTab('roster')" id="tabRoster" class="flex flex-col items-center gap-0.5 py-1 px-3 rounded-xl transition-colors">
+          <i data-lucide="book-open" class="w-4 h-4"></i>
+          <span>Grimoire</span>
+        </button>
+      </div>
+    </nav>
+  </div>
+
+  <!-- ================= MODALS ================= -->
+
+  <!-- MODAL: NIGHT TURN ORDER MANAGER -->
+  <div id="orderManagerModal" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-3">
+    <div class="glass-card bg-obsidian-950 border border-silver-400/20 rounded-3xl p-4 max-w-sm w-full space-y-3 shadow-2xl max-h-[85vh] flex flex-col">
+      <div class="flex justify-between items-center border-b border-silver-400/15 pb-2">
+        <div>
+          <h3 class="font-cinzel text-xs font-bold text-silver-100 flex items-center gap-1.5">
+            <i data-lucide="arrow-up-down" class="w-3.5 h-3.5 text-ether-cyan"></i>
+            <span>Night Sequence Order</span>
+          </h3>
+          <p class="text-[10px] text-silver-400">Shift roles up or down</p>
+        </div>
+        <button onclick="closeModal('orderManagerModal')" class="p-1 rounded-lg bg-obsidian-800 text-silver-400 hover:text-white">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <div class="flex-1 overflow-y-auto custom-scrollbar space-y-1.5 pr-0.5" id="orderManagerList">
+        <!-- JS injected -->
+      </div>
+
+      <div class="pt-2 border-t border-silver-400/15">
+        <button onclick="saveNightStepOrder()" class="w-full bg-gradient-to-r from-cyan-600 to-purple-600 hover:opacity-95 text-white font-bold py-2 rounded-xl text-xs active:scale-95 shadow">
+          Confirm Order
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: ROLE CATALOG MANAGER -->
+  <div id="roleManagerModal" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-end sm:items-center justify-center p-3">
+    <div class="glass-card bg-obsidian-950 border border-silver-400/20 rounded-3xl p-4 max-w-sm w-full space-y-3 shadow-2xl max-h-[85vh] flex flex-col">
+      <div class="flex justify-between items-center border-b border-silver-400/15 pb-2">
+        <div>
+          <h3 class="font-cinzel text-xs font-bold text-silver-100 flex items-center gap-1.5">
+            <i data-lucide="sliders" class="w-3.5 h-3.5 text-ether-purple"></i>
+            <span>Role Catalog</span>
+          </h3>
+          <p class="text-[10px] text-silver-400">Custom characters & powers</p>
+        </div>
+        <button onclick="closeModal('roleManagerModal')" class="p-1 rounded-lg bg-obsidian-800 text-silver-400 hover:text-white">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <button onclick="openEditRoleForm(null)" class="w-full bg-ether-cyan/15 border border-ether-cyan/40 hover:bg-ether-cyan/25 text-ether-cyan py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1 active:scale-95 transition-all">
+        <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i>
+        <span>Create Custom Role</span>
+      </button>
+
+      <div class="flex-1 overflow-y-auto custom-scrollbar space-y-1.5 pr-0.5" id="roleManagerList">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: EDIT ROLE FORM -->
+  <div id="roleFormModal" class="hidden fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="glass-card bg-obsidian-950 border border-silver-400/20 rounded-3xl p-4 max-w-sm w-full space-y-3 shadow-2xl max-h-[90vh] overflow-y-auto custom-scrollbar">
+      <div class="flex justify-between items-center border-b border-silver-400/15 pb-1.5">
+        <h3 class="font-cinzel text-xs font-bold text-silver-100" id="roleFormModalTitle">New Role</h3>
+        <button onclick="closeModal('roleFormModal')" class="p-1 text-silver-400 hover:text-white">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <input type="hidden" id="formRoleKey">
+
+      <div>
+        <label class="block text-[10px] text-silver-400 mb-0.5 font-semibold">Name</label>
+        <input type="text" id="formRoleName" placeholder="Role name..." 
+          class="w-full bg-obsidian-900 border border-silver-400/20 rounded-xl px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-ether-cyan">
+      </div>
+
+      <div class="grid grid-cols-2 gap-2">
+        <div>
+          <label class="block text-[10px] text-silver-400 mb-0.5 font-semibold">Icon / Emoji</label>
+          <input type="text" id="formRoleIcon" placeholder="e.g. 🛡️, 🏹" 
+            class="w-full bg-obsidian-900 border border-silver-400/20 rounded-xl px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-ether-cyan text-center">
+        </div>
+        <div>
+          <label class="block text-[10px] text-silver-400 mb-0.5 font-semibold">Alignment</label>
+          <select id="formRoleTeam" class="w-full bg-obsidian-900 border border-silver-400/20 rounded-xl px-2 py-1.5 text-xs text-white focus:outline-none focus:border-ether-cyan">
+            <option value="village">Village</option>
+            <option value="werewolf">Werewolf</option>
+            <option value="neutral">Neutral / Solo</option>
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-[10px] text-silver-400 mb-0.5 font-semibold">Target Action</label>
+        <select id="formRoleTargetType" class="w-full bg-obsidian-900 border border-silver-400/20 rounded-xl px-2 py-1.5 text-xs text-white focus:outline-none focus:border-ether-cyan">
+          <option value="single">Single Target (Inspect/Action)</option>
+          <option value="kill">Kill Target</option>
+          <option value="protect">Protect / Shield Target</option>
+          <option value="double">Two Targets (Lovers)</option>
+          <option value="oracle_query">Oracle Riddle / Zone Query</option>
+          <option value="none">No Night Target</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="block text-[10px] text-silver-400 mb-0.5 font-semibold">Description & Silent GM Signals</label>
+        <textarea id="formRoleDesc" rows="2.5" placeholder="GM Prompts and secret hand gestures..." 
+          class="w-full bg-obsidian-900 border border-silver-400/20 rounded-xl p-2 text-xs text-white focus:outline-none focus:border-ether-cyan"></textarea>
+      </div>
+
+      <div class="flex gap-2 pt-1">
+        <button onclick="saveRoleForm()" class="flex-1 bg-gradient-to-r from-cyan-600 to-purple-600 hover:opacity-95 text-white font-bold py-2 rounded-xl text-xs active:scale-95 shadow flex items-center justify-center gap-1">
+          <i data-lucide="check" class="w-3.5 h-3.5"></i>
+          <span>Save Role</span>
+        </button>
+        <button onclick="closeModal('roleFormModal')" class="px-3 bg-obsidian-800 text-silver-400 font-medium py-2 rounded-xl text-xs active:scale-95">
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: PRESETS SELECTOR -->
+  <div id="presetSelectModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="glass-card bg-obsidian-950 border border-silver-400/20 rounded-3xl p-4 max-w-xs w-full space-y-2.5 shadow-2xl">
+      <div class="flex justify-between items-center border-b border-silver-400/15 pb-1.5">
+        <h3 class="font-cinzel text-xs font-bold text-silver-100">Preset Decks</h3>
+        <button onclick="closeModal('presetSelectModal')" class="p-1 text-silver-400 hover:text-white">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <div class="space-y-1.5 text-xs">
+        <button onclick="applyPreset('twelveGathering')" class="w-full text-left p-2.5 rounded-xl bg-obsidian-900 border border-ether-cyan/30 hover:border-ether-cyan space-y-0.5">
+          <div class="font-bold text-ether-cyan flex items-center justify-between text-xs font-cinzel">
+            <span>12-Player Gathering (Your Group)</span>
+            <span class="text-[10px] text-silver-400">🐺 3 | 🧑 9</span>
+          </div>
+          <p class="text-[10px] text-silver-400">3 Werewolves, Seer, Bodyguard, Witch, Hunter, Cupid, Oracle, 3 Villagers.</p>
+        </button>
+
+        <button onclick="applyPreset('classic')" class="w-full text-left p-2.5 rounded-xl bg-obsidian-900 border border-silver-400/20 hover:border-ether-purple space-y-0.5">
+          <div class="font-bold text-ether-purple flex items-center justify-between text-xs font-cinzel">
+            <span>Classic Standard (8)</span>
+            <span class="text-[10px] text-silver-400">🐺 2 | 🧑 6</span>
+          </div>
+          <p class="text-[10px] text-silver-400">2 Werewolves, Seer, Bodyguard, Witch, Hunter, Cupid, Villager.</p>
+        </button>
+
+        <button onclick="applyPreset('chaos10')" class="w-full text-left p-2.5 rounded-xl bg-obsidian-900 border border-silver-400/20 hover:border-ether-cyan space-y-0.5">
+          <div class="font-bold text-silver-200 flex items-center justify-between text-xs font-cinzel">
+            <span>Chaos Expansion (10)</span>
+            <span class="text-[10px] text-silver-400">🐺 3 | 🃏 1 | 🧑 6</span>
+          </div>
+          <p class="text-[10px] text-silver-400">3 Werewolves, Seer, Bodyguard, Witch, Hunter, Mayor, Oracle, Tanner.</p>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: ROLE ASSIGN -->
+  <div id="roleAssignModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-end sm:items-center justify-center p-3">
+    <div class="glass-card bg-obsidian-950 border border-silver-400/20 rounded-3xl p-4 max-w-xs w-full space-y-2.5 shadow-2xl">
+      <div class="flex justify-between items-center">
+        <div>
+          <h3 class="font-cinzel text-xs font-bold text-silver-100">Assign Role</h3>
+          <p class="text-[10px] text-silver-400" id="assignModalPlayerName">Player</p>
+        </div>
+        <button onclick="closeModal('roleAssignModal')" class="p-1 text-silver-400 hover:text-white">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <div class="grid grid-cols-2 gap-1.5 max-h-56 overflow-y-auto custom-scrollbar" id="assignRoleGrid">
+        <!-- Injected by JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: VICTORY CELEBRATION -->
+  <div id="victoryModal" class="hidden fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4 text-center">
+    <div class="glass-card bg-obsidian-950 border border-ether-cyan/40 rounded-3xl p-5 max-w-xs w-full space-y-3 shadow-2xl">
+      <div class="text-4xl" id="victoryIcon">🏆</div>
+      <h2 class="font-gothic text-lg font-black text-silver-100" id="victoryTitle">VICTORY</h2>
+      <p class="text-[11px] text-silver-300 font-medieval leading-relaxed" id="victoryDescription">The chronicles have concluded.</p>
+
+      <button onclick="closeModal('victoryModal')" class="w-full bg-gradient-to-r from-cyan-600 to-purple-600 hover:opacity-95 text-white font-bold py-2.5 rounded-xl text-xs shadow">
+        Examine Roster
+      </button>
+    </div>
+  </div>
+
+  <!-- MODAL: ROLE GUIDE -->
+  <div id="quickHelpModal" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="glass-card bg-obsidian-950 border border-silver-400/20 rounded-3xl p-4 max-w-xs w-full space-y-2.5 shadow-2xl max-h-[85vh] overflow-y-auto custom-scrollbar">
+      <div class="flex justify-between items-center border-b border-silver-400/15 pb-1.5">
+        <h3 class="font-cinzel text-xs font-bold text-silver-100">Roles & Signals Guide</h3>
+        <button onclick="closeModal('quickHelpModal')" class="p-1 text-silver-400 hover:text-white">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+      <div class="text-[11px] text-silver-300 space-y-2.5 leading-relaxed">
+        <div class="p-2 rounded-xl bg-obsidian-900 border border-ether-cyan/20">
+          <strong class="text-ether-cyan block font-cinzel">Seer vs. Oracle:</strong>
+          <span class="text-slate-300 block mb-1">• <strong>Seer (🔮):</strong> Inspects <em>one living player</em> directly. GM signals 👍 (Wolf) or 👎 (Innocent).</span>
+          <span class="text-slate-300 block">• <strong>Oracle (🧿):</strong> Points to <em>two adjacent neighbors</em> to inquire if at least one is a Werewolf, or asks about fallen spirits!</span>
+        </div>
+        <div>
+          <strong class="text-ether-glow block font-cinzel">Bodyguard / Protector (🛡️):</strong>
+          Shields one player from attack. Cannot pick the same target two consecutive nights!
+        </div>
+        <div>
+          <strong class="text-purple-400 block font-cinzel">Witch (🧪):</strong>
+          Shows tonight's victim. Witch nods for Heal, points for Poison.
+        </div>
+        <div>
+          <strong class="text-amber-400 block font-cinzel">Hunter (🏹):</strong>
+          When dying, immediately chooses one player to drag into the grave with them.
+        </div>
+        <div>
+          <strong class="text-pink-400 block font-cinzel">Tanner / Fool (🎭):</strong>
+          Wins solo if executed by the village during the day vote!
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="fixed top-12 left-1/2 -translate-x-1/2 z-50 hidden px-3.5 py-1.5 bg-gradient-to-r from-cyan-600 to-purple-600 text-white text-[11px] font-semibold rounded-full shadow-2xl transition-all border border-white/20">
+    Notification
+  </div>
+
+  <!-- ================= APPLICATION CODE ENGINE ================= -->
+  <script>
+    /* -------------------------------------------------------------
+     * 1. THREE.JS 3D AMBIENT PARTICLE MOTES (Lantern Embers & Stardust)
+     * ------------------------------------------------------------- */
+    let threeScene, threeCamera, threeRenderer, particleSystem;
+    let particlePositions, particleVelocities, particleCount = 90;
+
+    function initThreeAmbience() {
+      const canvas = document.getElementById('three-bg-canvas');
+      threeScene = new THREE.Scene();
+
+      threeCamera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+      threeCamera.position.z = 8;
+
+      threeRenderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
+      threeRenderer.setSize(window.innerWidth, window.innerHeight);
+      threeRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+      // Light Particle Motes (Warm lantern embers, fairy lights, celestial mist)
+      const particleGeo = new THREE.BufferGeometry();
+      particlePositions = new Float32Array(particleCount * 3);
+      particleVelocities = [];
+      const colors = new Float32Array(particleCount * 3);
+
+      const colorAmber = new THREE.Color(0xf59e0b); // lantern light
+      const colorCyan = new THREE.Color(0x22d3ee);  // moon ether
+      const colorPurple = new THREE.Color(0xa855f7);// mystic twilight
+      const colorSilver = new THREE.Color(0xf8fafc);// starlight
+
+      for (let i = 0; i < particleCount; i++) {
+        const i3 = i * 3;
+        particlePositions[i3] = (Math.random() - 0.5) * 12;
+        particlePositions[i3 + 1] = (Math.random() - 0.5) * 16;
+        particlePositions[i3 + 2] = (Math.random() - 0.5) * 6;
+
+        particleVelocities.push({
+          y: 0.006 + Math.random() * 0.012,
+          xSway: 0.002 + Math.random() * 0.005,
+          offset: Math.random() * Math.PI * 2
+        });
+
+        // Distribute colors: glowing lantern amber, celestial cyan, soft purple
+        const rand = Math.random();
+        let selectedColor = colorAmber;
+        if (rand < 0.4) selectedColor = colorCyan;
+        else if (rand < 0.7) selectedColor = colorAmber;
+        else if (rand < 0.9) selectedColor = colorPurple;
+        else selectedColor = colorSilver;
+
+        colors[i3] = selectedColor.r;
+        colors[i3 + 1] = selectedColor.g;
+        colors[i3 + 2] = selectedColor.b;
+      }
+
+      particleGeo.setAttribute('position', new THREE.BufferAttribute(particlePositions, 3));
+      particleGeo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+      // Soft circular point texture generated programmatically
+      const pCanvas = document.createElement('canvas');
+      pCanvas.width = 32;
+      pCanvas.height = 32;
+      const pCtx = pCanvas.getContext('2d');
+      const grad = pCtx.createRadialGradient(16, 16, 0, 16, 16, 16);
+      grad.addColorStop(0, 'rgba(255,255,255,1)');
+      grad.addColorStop(0.3, 'rgba(255,255,255,0.8)');
+      grad.addColorStop(0.7, 'rgba(255,255,255,0.2)');
+      grad.addColorStop(1, 'rgba(255,255,255,0)');
+      pCtx.fillStyle = grad;
+      pCtx.fillRect(0, 0, 32, 32);
+
+      const pTexture = new THREE.CanvasTexture(pCanvas);
+
+      const particleMat = new THREE.PointsMaterial({
+        size: 0.18,
+        map: pTexture,
+        vertexColors: true,
+        transparent: true,
+        opacity: 0.85,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false
+      });
+
+      particleSystem = new THREE.Points(particleGeo, particleMat);
+      threeScene.add(particleSystem);
+
+      window.addEventListener('resize', onWindowResize);
+      animateThree();
+    }
+
+    function onWindowResize() {
+      if (!threeCamera || !threeRenderer) return;
+      threeCamera.aspect = window.innerWidth / window.innerHeight;
+      threeCamera.updateProjectionMatrix();
+      threeRenderer.setSize(window.innerWidth, window.innerHeight);
+    }
+
+    let clockTime = 0;
+    function animateThree() {
+      requestAnimationFrame(animateThree);
+      clockTime += 0.02;
+
+      if (particlePositions) {
+        for (let i = 0; i < particleCount; i++) {
+          const i3 = i * 3;
+          const vel = particleVelocities[i];
+
+          // Float upwards
+          particlePositions[i3 + 1] += vel.y;
+          // Gentle horizontal drift
+          particlePositions[i3] += Math.sin(clockTime + vel.offset) * vel.xSway;
+
+          // Recycle from bottom
+          if (particlePositions[i3 + 1] > 8) {
+            particlePositions[i3 + 1] = -8;
+            particlePositions[i3] = (Math.random() - 0.5) * 12;
+          }
+        }
+        particleSystem.geometry.attributes.position.needsUpdate = true;
+      }
+
+      threeRenderer.render(threeScene, threeCamera);
+    }
+
+    /* -------------------------------------------------------------
+     * 2. AUDIO SYNTHESIS
+     * ------------------------------------------------------------- */
+    const SoundEngine = {
+      ctx: null,
+      init() {
+        if (!this.ctx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          this.ctx = new AudioContext();
+        }
+        if (this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+      },
+      howl() {
+        this.init();
+        const t = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        const filter = this.ctx.createBiquadFilter();
+
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(140, t);
+        osc.frequency.exponentialRampToValueAtTime(380, t + 0.9);
+        osc.frequency.exponentialRampToValueAtTime(320, t + 1.8);
+        osc.frequency.exponentialRampToValueAtTime(110, t + 2.8);
+
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(400, t);
+        filter.frequency.linearRampToValueAtTime(1200, t + 0.9);
+        filter.frequency.exponentialRampToValueAtTime(250, t + 2.8);
+
+        gain.gain.setValueAtTime(0.01, t);
+        gain.gain.linearRampToValueAtTime(0.2, t + 0.6);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 2.8);
+
+        osc.connect(filter);
+        filter.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        osc.start(t);
+        osc.stop(t + 2.8);
+      },
+      bell() {
+        this.init();
+        const t = this.ctx.currentTime;
+        [520, 1040, 1560].forEach((freq, i) => {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(freq, t);
+          gain.gain.setValueAtTime(0.12 / (i + 1), t);
+          gain.gain.exponentialRampToValueAtTime(0.0001, t + 2.4);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(t);
+          osc.stop(t + 2.4);
+        });
+      },
+      beep(high = false) {
+        this.init();
+        const t = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(high ? 880 : 440, t);
+        gain.gain.setValueAtTime(0.15, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.15);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(t);
+        osc.stop(t + 0.15);
+      }
+    };
+
+    /* -------------------------------------------------------------
+     * 3. EXACT 12 PRESET PLAYERS
+     * ------------------------------------------------------------- */
+    const REQUESTED_12_PLAYERS = [
+      'Charles',
+      'Judy',
+      'Paul',
+      'Hannah',
+      'Charade',
+      'Joyjoy',
+      'Bianca',
+      'Kem',
+      'Ann',
+      'Khan',
+      'Name',
+      'CJ'
+    ];
+
+    /* -------------------------------------------------------------
+     * 4. STANDARD ROLES (INCLUDING BODYGUARD & ORACLE)
+     * ------------------------------------------------------------- */
+    const DEFAULT_STANDARD_ROLES = {
+      cupid: {
+        name: 'Cupid',
+        team: 'village',
+        icon: '💘',
+        color: 'text-pink-400',
+        nightOrder: 10,
+        targetType: 'double',
+        desc: 'Night 1: Selects 2 players to bind in eternal love.',
+        custom: false
+      },
+      seer: {
+        name: 'Seer',
+        team: 'village',
+        icon: '🔮',
+        color: 'text-purple-400',
+        nightOrder: 20,
+        targetType: 'single',
+        desc: 'Inspects one living player each night to uncover allegiance.',
+        custom: false
+      },
+      oracle: {
+        name: 'Oracle',
+        team: 'village',
+        icon: '🧿',
+        color: 'text-indigo-400',
+        nightOrder: 25,
+        targetType: 'oracle_query',
+        desc: 'Queries whether adjacent neighbors contain a Werewolf, or consults the dead.',
+        custom: false
+      },
+      werewolf: {
+        name: 'Werewolf',
+        team: 'werewolf',
+        icon: '🐺',
+        color: 'text-rose-400',
+        nightOrder: 30,
+        targetType: 'kill',
+        desc: 'Awakens with the pack to select a villager to kill.',
+        custom: false
+      },
+      bodyguard: {
+        name: 'Bodyguard',
+        team: 'village',
+        icon: '🛡️',
+        color: 'text-cyan-400',
+        nightOrder: 40,
+        targetType: 'protect',
+        desc: 'Shields one player each night from attack. Cannot pick the same target two nights consecutively.',
+        custom: false
+      },
+      witch: {
+        name: 'Witch',
+        team: 'village',
+        icon: '🧪',
+        color: 'text-emerald-400',
+        nightOrder: 50,
+        targetType: 'witch_potions',
+        desc: 'Has 1 Heal potion and 1 Poison potion for the entire match.',
+        custom: false
+      },
+      hunter: {
+        name: 'Hunter',
+        team: 'village',
+        icon: '🏹',
+        color: 'text-amber-400',
+        nightOrder: null,
+        targetType: 'none',
+        desc: 'Upon elimination, immediately retaliates by shooting one player.',
+        custom: false
+      },
+      mayor: {
+        name: 'Mayor',
+        team: 'village',
+        icon: '🎖️',
+        color: 'text-yellow-400',
+        nightOrder: null,
+        targetType: 'none',
+        desc: 'Vote counts as two during the town hall council.',
+        custom: false
+      },
+      tanner: {
+        name: 'Tanner',
+        team: 'neutral',
+        icon: '🎭',
+        color: 'text-orange-400',
+        nightOrder: null,
+        targetType: 'none',
+        desc: 'Wins solo if executed by the village during the day vote!',
+        custom: false
+      },
+      villager: {
+        name: 'Villager',
+        team: 'village',
+        icon: '🧑',
+        color: 'text-slate-300',
+        nightOrder: null,
+        targetType: 'none',
+        desc: 'No night action. Relies on debate, wit, and deduction.',
+        custom: false
+      }
+    };
+
+    const PRESETS = {
+      twelveGathering: {
+        name: '12-Player Gathering',
+        deck: { werewolf: 3, seer: 1, bodyguard: 1, witch: 1, hunter: 1, cupid: 1, oracle: 1, villager: 3 }
+      },
+      classic: {
+        name: 'Classic Standard (8)',
+        deck: { werewolf: 2, seer: 1, bodyguard: 1, witch: 1, hunter: 1, cupid: 1, villager: 1 }
+      },
+      chaos10: {
+        name: 'Chaos Expansion (10)',
+        deck: { werewolf: 3, seer: 1, bodyguard: 1, witch: 1, hunter: 1, mayor: 1, oracle: 1, tanner: 1 }
+      }
+    };
+
+    /* Generate an Avatar Badge */
+    function generateAvatarSvg(name, roleKey) {
+      const colors = ['#06b6d4', '#8b5cf6', '#a855f7', '#3b82f6', '#14b8a6', '#6366f1'];
+      let hash = 0;
+      for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
+      const bg = colors[Math.abs(hash) % colors.length];
+      const initial = name.charAt(0).toUpperCase();
+
+      return `
+        <svg viewBox="0 0 40 40" class="w-6 h-6 rounded-full shadow-inner flex-shrink-0">
+          <circle cx="20" cy="20" r="19" fill="${bg}" stroke="#ffffff30" stroke-width="1.5" />
+          <text x="20" y="24" text-anchor="middle" font-family="'Cinzel', serif" font-weight="bold" font-size="13" fill="#ffffff">${initial}</text>
+        </svg>
+      `;
+    }
+
+    /* -------------------------------------------------------------
+     * 5. SESSION DATA MODEL
+     * ------------------------------------------------------------- */
+    const AppData = {
+      sessions: [],
+      activeSessionId: null
+    };
+
+    function generateSessionId() {
+      return 'session_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+    }
+
+    function createSessionObject(title) {
+      return {
+        id: generateSessionId(),
+        title: title || 'Paskong Pinoy Vigil',
+        createdAt: new Date().toLocaleDateString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
+        phase: 'SETUP',
+        dayNumber: 1,
+        players: [],
+        roles: JSON.parse(JSON.stringify(DEFAULT_STANDARD_ROLES)),
+        deckConfig: { ...PRESETS.twelveGathering.deck },
+        nightStepOrder: ['cupid', 'seer', 'oracle', 'werewolf', 'bodyguard', 'witch'],
+        currentStepIndex: 0,
+        witchPotions: { healAvailable: true, poisonAvailable: true },
+        nightTargets: {
+          lovers: [],
+          seerTarget: null,
+          oracleTarget: null,
+          werewolfVictimId: null,
+          protectedId: null,
+          witchHealedVictim: false,
+          witchPoisonTargetId: null,
+          customInteractions: {},
+          casualties: []
+        },
+        timerSeconds: 180,
+        timerRunning: false,
+        selectedLynchTargetId: null,
+        historyLog: []
+      };
+    }
+
+    function getActiveSession() {
+      return AppData.sessions.find(s => s.id === AppData.activeSessionId);
+    }
+
+    /* -------------------------------------------------------------
+     * 6. SCREEN TRANSITIONS
+     * ------------------------------------------------------------- */
+    function showTitleScreen() {
+      document.getElementById('screenTitle').classList.remove('hidden');
+      document.getElementById('screenMenu').classList.add('hidden');
+      document.getElementById('activeGameWrapper').classList.add('hidden');
+    }
+
+    function enterMainMenu() {
+      SoundEngine.howl();
+      document.getElementById('screenTitle').classList.add('hidden');
+      document.getElementById('screenMenu').classList.remove('hidden');
+      document.getElementById('activeGameWrapper').classList.add('hidden');
+      renderSessionsList();
+      refreshIcons();
+    }
+
+    function returnToMainMenu() {
+      document.getElementById('activeGameWrapper').classList.add('hidden');
+      document.getElementById('screenMenu').classList.remove('hidden');
+      renderSessionsList();
+      refreshIcons();
+    }
+
+    function enterActiveGame(sessionId) {
+      AppData.activeSessionId = sessionId;
+      const s = getActiveSession();
+      if (!s) return;
+
+      document.getElementById('screenMenu').classList.add('hidden');
+      document.getElementById('activeGameWrapper').classList.remove('hidden');
+
+      document.getElementById('hudSessionTitle').innerText = s.title;
+
+      renderPlayerChips();
+      renderRolesSelectorGrid();
+      updateDeckMatchStatus();
+      updateHeaderStats();
+
+      if (s.phase === 'SETUP') switchTab('setup');
+      else if (s.phase === 'NIGHT') { switchTab('night'); renderNightStep(); }
+      else if (s.phase === 'DAWN') { switchTab('dawn'); renderDawnReport(); }
+      else if (s.phase === 'DAY') { switchTab('day'); renderLivingVoteList(); }
+
+      refreshIcons();
+    }
+
+    /* -------------------------------------------------------------
+     * 7. SESSION MANAGER
+     * ------------------------------------------------------------- */
+    function createNewSession() {
+      const input = document.getElementById('sessionTitleInput');
+      const title = input.value.trim();
+      const newSession = createSessionObject(title);
+      AppData.sessions.unshift(newSession);
+      input.value = '';
+      renderSessionsList();
+      showToast('Session forged');
+      enterActiveGame(newSession.id);
+    }
+
+    function deleteSession(id, e) {
+      if (e) e.stopPropagation();
+      if (confirm('Delete this session chronicle?')) {
+        AppData.sessions = AppData.sessions.filter(s => s.id !== id);
+        renderSessionsList();
+        showToast('Session deleted');
+      }
+    }
+
+    function renderSessionsList() {
+      const container = document.getElementById('sessionsListContainer');
+      if (AppData.sessions.length === 0) {
+        container.innerHTML = `
+          <div class="glass-card rounded-2xl p-6 text-center text-silver-400 space-y-2 border-dashed border-silver-400/20">
+            <i data-lucide="book-open" class="w-8 h-8 mx-auto text-silver-500 opacity-60"></i>
+            <p class="text-xs font-medieval">No chronicles found.</p>
+            <p class="text-[11px] text-slate-400">Forge a session above to begin your game.</p>
+          </div>
+        `;
+        refreshIcons();
+        return;
+      }
+
+      container.innerHTML = AppData.sessions.map(s => {
+        const playerCount = s.players.length;
+        const livingCount = s.players.filter(p => p.alive).length;
+        return `
+          <div onclick="enterActiveGame('${s.id}')" class="glass-card rounded-2xl p-3.5 border border-silver-400/15 hover:border-ether-cyan/40 active:scale-98 transition-all flex items-center justify-between cursor-pointer shadow-lg group">
+            <div class="space-y-0.5 truncate mr-2">
+              <div class="flex items-center gap-2">
+                <span class="font-cinzel text-xs font-bold text-white group-hover:text-ether-cyan transition-colors truncate">${s.title}</span>
+                <span class="text-[9px] uppercase px-1.5 py-0.2 rounded bg-white/5 border border-silver-400/20 text-ether-glow font-bold">${s.phase}</span>
+              </div>
+              <div class="text-[10px] text-silver-400 flex items-center gap-2 font-medium">
+                <span>${s.createdAt}</span>
+                <span>•</span>
+                <span>${playerCount} Players (${livingCount} living)</span>
+              </div>
+            </div>
+            <div class="flex items-center gap-1.5 flex-shrink-0">
+              <button onclick="deleteSession('${s.id}', event)" class="p-2 rounded-xl bg-obsidian-800/90 hover:bg-purple-950/80 text-silver-400 hover:text-white transition-colors">
+                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+      refreshIcons();
+    }
+
+    /* -------------------------------------------------------------
+     * 8. PLAYERS SETUP & 12-PLAYER PRESET INJECTION
+     * ------------------------------------------------------------- */
+    function addPlayer(name) {
+      const s = getActiveSession();
+      if (!s) return;
+      const input = document.getElementById('newPlayerName');
+      const playerName = (name || input.value).trim();
+      if (!playerName) return;
+
+      const newId = 'p_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+      s.players.push({
+        id: newId,
+        name: playerName,
+        roleKey: null,
+        alive: true,
+        isLover: false,
+        lastProtected: false
+      });
+
+      if (!name) input.value = '';
+      renderPlayerChips();
+      updateDeckMatchStatus();
+      refreshIcons();
+    }
+
+    function removePlayer(id) {
+      const s = getActiveSession();
+      if (!s) return;
+      s.players = s.players.filter(p => p.id !== id);
+      renderPlayerChips();
+      updateDeckMatchStatus();
+      refreshIcons();
+    }
+
+    function quickAddYourTwelvePlayers() {
+      const s = getActiveSession();
+      if (!s) return;
+      s.players = [];
+      REQUESTED_12_PLAYERS.forEach(name => addPlayer(name));
+      showToast('12 Preset Players Loaded');
+    }
+
+    function renderPlayerChips() {
+      const s = getActiveSession();
+      if (!s) return;
+      const container = document.getElementById('playerChipsContainer');
+      document.getElementById('playerCount').innerText = s.players.length;
+
+      if (s.players.length === 0) {
+        container.innerHTML = '<span class="text-[11px] text-silver-500 italic">No players enrolled yet.</span>';
+        return;
+      }
+
+      container.innerHTML = s.players.map((p, idx) => {
+        const roleDef = p.roleKey ? s.roles[p.roleKey] : null;
+        const icon = roleDef ? roleDef.icon : '❓';
+        const avatarSvg = generateAvatarSvg(p.name, p.roleKey);
+
+        return `
+          <div class="flex items-center gap-1.5 bg-obsidian-950/80 border border-silver-400/15 px-2 py-1 rounded-xl text-xs shadow-inner">
+            ${avatarSvg}
+            <button onclick="openRoleAssignModal('${p.id}')" class="flex items-center gap-1 hover:text-ether-cyan font-medium text-left">
+              <span class="truncate max-w-[65px] text-[11px] text-white">${p.name}</span>
+              <span class="text-[10px]">${icon}</span>
+            </button>
+            <button onclick="removePlayer('${p.id}')" class="text-silver-500 hover:text-ether-glow p-0.5 ml-0.5">
+              <i data-lucide="x" class="w-3 h-3"></i>
+            </button>
+          </div>
+        `;
+      }).join('');
+      refreshIcons();
+    }
+
+    /* -------------------------------------------------------------
+     * 9. DECK & ROLE ASSIGNMENT
+     * ------------------------------------------------------------- */
+    function renderRolesSelectorGrid() {
+      const s = getActiveSession();
+      if (!s) return;
+      const grid = document.getElementById('rolesSelectorGrid');
+      grid.innerHTML = Object.entries(s.roles).map(([key, def]) => {
+        const count = s.deckConfig[key] || 0;
+        return `
+          <div class="bg-obsidian-950/80 border border-silver-400/10 p-1.5 rounded-xl flex items-center justify-between">
+            <div class="flex items-center gap-1.5 truncate mr-1">
+              <span class="text-sm">${def.icon}</span>
+              <span class="truncate font-medium text-silver-200 text-[11px] font-cinzel">${def.name}</span>
+            </div>
+            <div class="flex items-center gap-1 flex-shrink-0">
+              <button onclick="adjustRoleCount('${key}', -1)" class="w-5 h-5 rounded bg-obsidian-800 active:scale-90 flex items-center justify-center text-silver-300">
+                <i data-lucide="minus" class="w-3 h-3"></i>
+              </button>
+              <span class="w-3.5 text-center font-bold text-silver-100 text-[11px]">${count}</span>
+              <button onclick="adjustRoleCount('${key}', 1)" class="w-5 h-5 rounded bg-obsidian-800 active:scale-90 flex items-center justify-center text-silver-300">
+                <i data-lucide="plus" class="w-3 h-3"></i>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+      refreshIcons();
+    }
+
+    function adjustRoleCount(key, delta) {
+      const s = getActiveSession();
+      if (!s) return;
+      const current = s.deckConfig[key] || 0;
+      s.deckConfig[key] = Math.max(0, current + delta);
+      renderRolesSelectorGrid();
+      updateDeckMatchStatus();
+    }
+
+    function updateDeckMatchStatus() {
+      const s = getActiveSession();
+      if (!s) return;
+      const totalRoles = Object.values(s.deckConfig).reduce((a, b) => a + b, 0);
+      const totalPlayers = s.players.length;
+      const badge = document.getElementById('roleCountMatch');
+      badge.innerText = `${totalRoles}/${totalPlayers}`;
+
+      if (totalRoles === totalPlayers && totalPlayers > 0) {
+        badge.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-cyan-950/60 text-cyan-400 border border-cyan-500/30';
+      } else {
+        badge.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-950/60 text-purple-300 border border-purple-500/30';
+      }
+    }
+
+    function applyPreset(presetKey) {
+      const s = getActiveSession();
+      if (!s) return;
+      const preset = PRESETS[presetKey];
+      if (!preset) return;
+
+      s.deckConfig = { ...preset.deck };
+      document.getElementById('currentPresetName').innerText = preset.name;
+      renderRolesSelectorGrid();
+      updateDeckMatchStatus();
+      closeModal('presetSelectModal');
+      showToast(`Loaded ${preset.name}`);
+    }
+
+    /* Assign Player Role Modal */
+    let playerAssigningId = null;
+    function openRoleAssignModal(playerId) {
+      const s = getActiveSession();
+      if (!s) return;
+      playerAssigningId = playerId;
+      const p = s.players.find(x => x.id === playerId);
+      document.getElementById('assignModalPlayerName').innerText = p.name;
+
+      const grid = document.getElementById('assignRoleGrid');
+      grid.innerHTML = Object.entries(s.roles).map(([key, def]) => {
+        const isSelected = p.roleKey === key;
+        return `
+          <button onclick="setPlayerRole('${key}')" class="p-2 rounded-xl border text-left flex items-center gap-1.5 ${isSelected ? 'bg-cyan-950/60 border-cyan-500 text-cyan-200' : 'bg-obsidian-900 border-silver-400/10 hover:border-silver-400/30 text-silver-300'}">
+            <span class="text-sm">${def.icon}</span>
+            <span class="text-[11px] font-medium font-cinzel truncate">${def.name}</span>
+          </button>
+        `;
+      }).join('');
+
+      openModal('roleAssignModal');
+      refreshIcons();
+    }
+
+    function setPlayerRole(roleKey) {
+      const s = getActiveSession();
+      if (!s) return;
+      const p = s.players.find(x => x.id === playerAssigningId);
+      if (p) {
+        p.roleKey = roleKey;
+        renderPlayerChips();
+      }
+      closeModal('roleAssignModal');
+    }
+
+    function autoDistributeDeck() {
+      const s = getActiveSession();
+      if (!s) return;
+      const unassigned = s.players.filter(p => !p.roleKey);
+      if (unassigned.length === 0) return;
+
+      let pool = [];
+      const assignedCounts = {};
+      s.players.forEach(p => {
+        if (p.roleKey) assignedCounts[p.roleKey] = (assignedCounts[p.roleKey] || 0) + 1;
+      });
+
+      Object.entries(s.deckConfig).forEach(([role, count]) => {
+        const already = assignedCounts[role] || 0;
+        const needed = Math.max(0, count - already);
+        for (let i = 0; i < needed; i++) pool.push(role);
+      });
+
+      while (pool.length < unassigned.length) pool.push('villager');
+      pool = pool.sort(() => Math.random() - 0.5);
+
+      unassigned.forEach((p, idx) => {
+        p.roleKey = pool[idx];
+      });
+    }
+
+    /* -------------------------------------------------------------
+     * 10. NIGHT SEQUENCE RE-ORDERING
+     * ------------------------------------------------------------- */
+    function openOrderManagerModal() {
+      renderOrderManagerList();
+      openModal('orderManagerModal');
+    }
+
+    function renderOrderManagerList() {
+      const s = getActiveSession();
+      if (!s) return;
+      const list = document.getElementById('orderManagerList');
+
+      const wakeRoles = Object.keys(s.roles).filter(key => s.roles[key].nightOrder !== null);
+      wakeRoles.forEach(key => {
+        if (!s.nightStepOrder.includes(key)) s.nightStepOrder.push(key);
+      });
+
+      list.innerHTML = s.nightStepOrder.map((roleKey, idx) => {
+        const def = s.roles[roleKey];
+        if (!def) return '';
+        return `
+          <div class="p-2 rounded-xl bg-obsidian-900 border border-silver-400/15 flex items-center justify-between">
+            <div class="flex items-center gap-2 truncate">
+              <span class="text-xs font-mono text-silver-500 font-bold">${idx + 1}.</span>
+              <span class="text-base">${def.icon}</span>
+              <span class="text-xs font-cinzel font-bold text-white truncate">${def.name}</span>
+            </div>
+            <div class="flex items-center gap-1">
+              <button onclick="moveStepOrder('${roleKey}', -1)" ${idx === 0 ? 'disabled' : ''} class="p-1 rounded-lg bg-obsidian-800 hover:bg-obsidian-700 text-silver-300 disabled:opacity-30">
+                <i data-lucide="chevron-up" class="w-3.5 h-3.5"></i>
+              </button>
+              <button onclick="moveStepOrder('${roleKey}', 1)" ${idx === s.nightStepOrder.length - 1 ? 'disabled' : ''} class="p-1 rounded-lg bg-obsidian-800 hover:bg-obsidian-700 text-silver-300 disabled:opacity-30">
+                <i data-lucide="chevron-down" class="w-3.5 h-3.5"></i>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+      refreshIcons();
+    }
+
+    function moveStepOrder(roleKey, delta) {
+      const s = getActiveSession();
+      if (!s) return;
+      const index = s.nightStepOrder.indexOf(roleKey);
+      if (index === -1) return;
+      const targetIndex = index + delta;
+      if (targetIndex < 0 || targetIndex >= s.nightStepOrder.length) return;
+
+      const temp = s.nightStepOrder[index];
+      s.nightStepOrder[index] = s.nightStepOrder[targetIndex];
+      s.nightStepOrder[targetIndex] = temp;
+      renderOrderManagerList();
+    }
+
+    function saveNightStepOrder() {
+      closeModal('orderManagerModal');
+      showToast('Custom sequence saved');
+      const s = getActiveSession();
+      if (s && s.phase === 'NIGHT') {
+        compileActiveNightSteps();
+        renderNightStep();
+      }
+    }
+
+    /* -------------------------------------------------------------
+     * 11. ROLE MANAGER MODAL
+     * ------------------------------------------------------------- */
+    function openRoleManagerModal() {
+      renderRoleManagerList();
+      openModal('roleManagerModal');
+    }
+
+    function renderRoleManagerList() {
+      const s = getActiveSession();
+      if (!s) return;
+      const list = document.getElementById('roleManagerList');
+      list.innerHTML = Object.entries(s.roles).map(([key, def]) => {
+        const teamColor = def.team === 'werewolf' ? 'text-rose-400' : (def.team === 'village' ? 'text-cyan-400' : 'text-purple-400');
+        return `
+          <div class="p-2 rounded-xl bg-obsidian-900 border border-silver-400/15 flex items-center justify-between">
+            <div class="flex items-center gap-2 truncate mr-2">
+              <span class="text-base">${def.icon}</span>
+              <div class="truncate">
+                <div class="font-bold text-[11px] text-white flex items-center gap-1 font-cinzel truncate">
+                  <span>${def.name}</span>
+                  <span class="text-[8px] uppercase px-1 rounded bg-black ${teamColor} font-bold">${def.team}</span>
+                </div>
+                <div class="text-[9px] text-silver-400 truncate font-medieval">${def.desc}</div>
+              </div>
+            </div>
+            <div class="flex items-center gap-1 flex-shrink-0">
+              <button onclick="openEditRoleForm('${key}')" class="p-1 rounded-lg bg-obsidian-800 hover:bg-obsidian-700 text-silver-300">
+                <i data-lucide="edit-2" class="w-3.5 h-3.5"></i>
+              </button>
+              ${def.custom ? `
+                <button onclick="deleteCustomRole('${key}')" class="p-1 rounded-lg bg-purple-950/60 hover:bg-purple-900 text-purple-300">
+                  <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                </button>
+              ` : ''}
+            </div>
+          </div>
+        `;
+      }).join('');
+      refreshIcons();
+    }
+
+    function openEditRoleForm(key) {
+      const s = getActiveSession();
+      if (!s) return;
+      const isEdit = !!key;
+      const modalTitle = document.getElementById('roleFormModalTitle');
+      const keyInput = document.getElementById('formRoleKey');
+      const nameInput = document.getElementById('formRoleName');
+      const iconInput = document.getElementById('formRoleIcon');
+      const teamInput = document.getElementById('formRoleTeam');
+      const targetTypeInput = document.getElementById('formRoleTargetType');
+      const descInput = document.getElementById('formRoleDesc');
+
+      if (isEdit) {
+        const def = s.roles[key];
+        modalTitle.innerText = `Edit: ${def.name}`;
+        keyInput.value = key;
+        nameInput.value = def.name;
+        iconInput.value = def.icon;
+        teamInput.value = def.team;
+        targetTypeInput.value = def.targetType || 'single';
+        descInput.value = def.desc || '';
+      } else {
+        modalTitle.innerText = 'Create Role';
+        keyInput.value = '';
+        nameInput.value = '';
+        iconInput.value = '🛡️';
+        teamInput.value = 'village';
+        targetTypeInput.value = 'single';
+        descInput.value = '';
+      }
+
+      openModal('roleFormModal');
+      refreshIcons();
+    }
+
+    function saveRoleForm() {
+      const s = getActiveSession();
+      if (!s) return;
+      const keyVal = document.getElementById('formRoleKey').value.trim();
+      const name = document.getElementById('formRoleName').value.trim();
+      const icon = document.getElementById('formRoleIcon').value.trim() || '🛡️';
+      const team = document.getElementById('formRoleTeam').value;
+      const targetType = document.getElementById('formRoleTargetType').value;
+      const desc = document.getElementById('formRoleDesc').value.trim();
+
+      if (!name) {
+        showToast('Provide a role name');
+        return;
+      }
+
+      const roleKey = keyVal || ('custom_' + name.toLowerCase().replace(/[^a-z0-9]/g, '_'));
+      const hasNightAction = targetType !== 'none';
+
+      s.roles[roleKey] = {
+        name,
+        team,
+        icon,
+        color: team === 'werewolf' ? 'text-rose-400' : (team === 'village' ? 'text-cyan-400' : 'text-purple-400'),
+        nightOrder: hasNightAction ? 35 : null,
+        targetType,
+        desc: desc || 'Custom role with night duties.',
+        custom: true
+      };
+
+      if (!s.deckConfig[roleKey]) s.deckConfig[roleKey] = 0;
+      if (hasNightAction && !s.nightStepOrder.includes(roleKey)) s.nightStepOrder.push(roleKey);
+
+      closeModal('roleFormModal');
+      renderRoleManagerList();
+      renderRolesSelectorGrid();
+      updateDeckMatchStatus();
+      showToast(`Saved ${name}`);
+      refreshIcons();
+    }
+
+    function deleteCustomRole(key) {
+      const s = getActiveSession();
+      if (!s) return;
+      if (confirm(`Delete "${s.roles[key].name}"?`)) {
+        delete s.roles[key];
+        delete s.deckConfig[key];
+        s.nightStepOrder = s.nightStepOrder.filter(k => k !== key);
+        renderRoleManagerList();
+        renderRolesSelectorGrid();
+        updateDeckMatchStatus();
+        showToast('Role deleted');
+        refreshIcons();
+      }
+    }
+
+    /* -------------------------------------------------------------
+     * 12. GAME FLOW & TARGETING
+     * ------------------------------------------------------------- */
+    function startGame() {
+      const s = getActiveSession();
+      if (!s) return;
+      if (s.players.length < 4) {
+        showToast('Min 4 players required');
+        return;
+      }
+      autoDistributeDeck();
+      renderPlayerChips();
+
+      logEvent('🌑 Night 1 begins under the obsidian moon.');
+      startNightPhase(1);
+    }
+
+    function compileActiveNightSteps() {
+      const s = getActiveSession();
+      if (!s) return;
+      const hasLivingRole = (roleKey) => s.players.some(p => p.alive && p.roleKey === roleKey);
+
+      s.activeNightSteps = s.nightStepOrder.filter(roleKey => {
+        if (!s.roles[roleKey]) return false;
+        if (!hasLivingRole(roleKey)) return false;
+        if (roleKey === 'cupid' && s.dayNumber > 1) return false;
+        if (roleKey === 'witch' && !s.witchPotions.healAvailable && !s.witchPotions.poisonAvailable) return false;
+        return true;
+      });
+    }
+
+    function startNightPhase(dayNumber) {
+      const s = getActiveSession();
+      if (!s) return;
+      s.phase = 'NIGHT';
+      s.dayNumber = dayNumber;
+      s.nightTargets = {
+        lovers: s.nightTargets.lovers || [],
+        seerTarget: null,
+        oracleTarget: null,
+        werewolfVictimId: null,
+        protectedId: null,
+        witchHealedVictim: false,
+        witchPoisonTargetId: null,
+        customInteractions: {},
+        casualties: []
+      };
+
+      compileActiveNightSteps();
+      s.currentStepIndex = 0;
+
+      updateHeaderStats();
+      SoundEngine.howl();
+      switchTab('night');
+      renderNightStep();
+    }
+
+    function renderNightStep() {
+      const s = getActiveSession();
+      if (!s) return;
+      const totalSteps = s.activeNightSteps.length;
+      document.getElementById('nightTotalSteps').innerText = totalSteps;
+      document.getElementById('nightStepIndex').innerText = s.currentStepIndex + 1;
+      document.getElementById('nightSubheader').innerText = `Night ${s.dayNumber}`;
+
+      const roleKey = s.activeNightSteps[s.currentStepIndex];
+      const card = document.getElementById('nightStepCard');
+      const stepTitle = document.getElementById('nightStepTitle');
+      const def = s.roles[roleKey];
+
+      stepTitle.innerText = def ? def.name : 'Resolution';
+
+      let html = '';
+      if (roleKey === 'cupid') html = renderCupidStep();
+      else if (roleKey === 'seer') html = renderSeerStep();
+      else if (roleKey === 'oracle') html = renderOracleStep();
+      else if (roleKey === 'werewolf') html = renderWerewolfStep();
+      else if (roleKey === 'bodyguard') html = renderBodyguardStep();
+      else if (roleKey === 'witch') html = renderWitchStep();
+      else html = renderCustomRoleStep(roleKey, def);
+
+      card.innerHTML = html;
+      document.getElementById('btnPrevNight').disabled = (s.currentStepIndex === 0);
+      refreshIcons();
+    }
+
+    /* Step: Cupid */
+    function renderCupidStep() {
+      const s = getActiveSession();
+      const living = s.players.filter(p => p.alive);
+      return `
+        <div>
+          <div class="flex items-center gap-1.5 mb-1.5">
+            <span class="text-xl">💘</span>
+            <div>
+              <h3 class="font-cinzel text-xs font-bold text-pink-400">Cupid's Quiver</h3>
+              <p class="text-[10px] text-silver-400">Select 2 Soulmates</p>
+            </div>
+          </div>
+          <div class="bg-obsidian-950/80 p-2 rounded-xl border border-silver-400/10 text-[11px] text-silver-300 mb-2 font-medieval italic">
+            "Cupid, awaken. Point silently to two players to link in eternal love..."
+          </div>
+          <div class="grid grid-cols-2 gap-1.5 max-h-44 overflow-y-auto custom-scrollbar">
+            ${living.map(p => {
+              const isSelected = s.nightTargets.lovers.includes(p.id);
+              const avatar = generateAvatarSvg(p.name, p.roleKey);
+              return `
+                <button onclick="toggleLoverTarget('${p.id}')" class="p-2 rounded-xl border text-[11px] font-medium text-left flex items-center justify-between ${isSelected ? 'bg-pink-950/70 border-pink-500 text-pink-200 font-bold' : 'bg-obsidian-950/80 border-silver-400/10 text-silver-300'}">
+                  <div class="flex items-center gap-1.5 truncate">
+                    ${avatar}
+                    <span class="truncate">${p.name}</span>
+                  </div>
+                  ${isSelected ? '❤️' : ''}
+                </button>
+              `;
+            }).join('')}
+          </div>
+        </div>
+        <div class="text-[10px] text-silver-400">
+          GM: Tap both lovers so they recognise each other!
+        </div>
+      `;
+    }
+
+    function toggleLoverTarget(id) {
+      const s = getActiveSession();
+      if (!s) return;
+      let current = s.nightTargets.lovers || [];
+      if (current.includes(id)) {
+        current = current.filter(x => x !== id);
+      } else {
+        if (current.length >= 2) current.shift();
+        current.push(id);
+      }
+      s.nightTargets.lovers = current;
+      s.players.forEach(p => p.isLover = current.includes(p.id));
+      logEvent(`💘 Cupid bound: ${current.map(getPlayerName).join(' & ')}`);
+      renderNightStep();
+    }
+
+    /* Step: Seer (Direct Alignment Check) */
+    function renderSeerStep() {
+      const s = getActiveSession();
+      const targets = s.players.filter(p => p.alive && p.roleKey !== 'seer');
+      const selected = s.nightTargets.seerTarget ? s.players.find(p => p.id === s.nightTargets.seerTarget) : null;
+
+      let revealBadge = '';
+      if (selected) {
+        const isEvil = s.roles[selected.roleKey]?.team === 'werewolf';
+        revealBadge = `
+          <div class="mt-2 p-2 rounded-xl ${isEvil ? 'bg-rose-950/80 border-rose-500 text-rose-300' : 'bg-cyan-950/80 border-cyan-500 text-cyan-300'} border flex items-center justify-between animate-pulse">
+            <div>
+              <div class="text-[9px] uppercase font-bold font-cinzel">Vision Reveal:</div>
+              <div class="text-xs font-bold font-cinzel">${selected.name} is a ${s.roles[selected.roleKey]?.name}!</div>
+            </div>
+            <div class="text-xs font-bold">${isEvil ? '🐺 (Thumbs Down)' : '🧑 (Thumbs Up)'}</div>
+          </div>
+        `;
+      }
+
+      return `
+        <div>
+          <div class="flex items-center gap-1.5 mb-1.5">
+            <span class="text-xl">🔮</span>
+            <div>
+              <h3 class="font-cinzel text-xs font-bold text-purple-400">Seer's Divination</h3>
+              <p class="text-[10px] text-silver-400">Direct Alignment Inspection</p>
+            </div>
+          </div>
+          <div class="bg-obsidian-950/80 p-2 rounded-xl border border-silver-400/10 text-[11px] text-silver-300 mb-2 font-medieval italic">
+            "Seer, awaken. Point to who you wish to inspect..."
+          </div>
+          <div class="grid grid-cols-2 gap-1.5 max-h-36 overflow-y-auto custom-scrollbar">
+            ${targets.map(p => {
+              const active = s.nightTargets.seerTarget === p.id;
+              const avatar = generateAvatarSvg(p.name, p.roleKey);
+              return `
+                <button onclick="selectSeerTarget('${p.id}')" class="p-2 rounded-xl border text-[11px] text-left truncate flex items-center gap-1.5 ${active ? 'bg-purple-950/80 border-purple-500 text-purple-200 font-bold' : 'bg-obsidian-950/80 border-silver-400/10 text-silver-300'}">
+                  ${avatar}
+                  <span class="truncate">${p.name}</span>
+                </button>
+              `;
+            }).join('')}
+          </div>
+          ${revealBadge}
+        </div>
+        <div class="text-[10px] text-silver-400">
+          Show 👍 for Werewolf, 👎 for Innocent, then close eyes.
+        </div>
+      `;
+    }
+
+    function selectSeerTarget(id) {
+      const s = getActiveSession();
+      if (!s) return;
+      s.nightTargets.seerTarget = id;
+      logEvent(`🔮 Seer verified ${getPlayerName(id)}.`);
+      renderNightStep();
+    }
+
+    /* Step: Oracle */
+    function renderOracleStep() {
+      const s = getActiveSession();
+      const living = s.players.filter(p => p.alive && p.roleKey !== 'oracle');
+      const selected = s.nightTargets.oracleTarget ? s.players.find(p => p.id === s.nightTargets.oracleTarget) : null;
+
+      return `
+        <div>
+          <div class="flex items-center gap-1.5 mb-1.5">
+            <span class="text-xl">🧿</span>
+            <div>
+              <h3 class="font-cinzel text-xs font-bold text-cyan-400">Oracle's Commune</h3>
+              <p class="text-[10px] text-silver-400">Zone Inspection or Spirit Consultation</p>
+            </div>
+          </div>
+          <div class="bg-obsidian-950/80 p-2 rounded-xl border border-silver-400/10 text-[11px] text-silver-300 mb-2 font-medieval italic">
+            "Oracle, awaken. Point to a pair or zone to detect if evil lurks there..."
+          </div>
+          <div class="grid grid-cols-2 gap-1.5 max-h-36 overflow-y-auto custom-scrollbar">
+            ${living.map(p => {
+              const active = s.nightTargets.oracleTarget === p.id;
+              const avatar = generateAvatarSvg(p.name, p.roleKey);
+              return `
+                <button onclick="selectOracleTarget('${p.id}')" class="p-2 rounded-xl border text-[11px] text-left truncate flex items-center gap-1.5 ${active ? 'bg-cyan-950/80 border-cyan-500 text-cyan-200 font-bold' : 'bg-obsidian-950/80 border-silver-400/10 text-silver-300'}">
+                  ${avatar}
+                  <span class="truncate">${p.name}</span>
+                </button>
+              `;
+            }).join('')}
+          </div>
+          ${selected ? `
+            <div class="mt-2 p-2 rounded-xl bg-obsidian-900 border border-cyan-500/40 text-[11px] text-cyan-300">
+              Oracle inquired regarding <strong>${selected.name}</strong> and their neighbors.
+            </div>
+          ` : ''}
+        </div>
+        <div class="text-[10px] text-silver-400">
+          Nod if at least one in the Oracle's inspected zone is evil.
+        </div>
+      `;
+    }
+
+    function selectOracleTarget(id) {
+      const s = getActiveSession();
+      if (!s) return;
+      s.nightTargets.oracleTarget = id;
+      logEvent(`🧿 Oracle queried realm around ${getPlayerName(id)}.`);
+      renderNightStep();
+    }
+
+    /* Step: Werewolf */
+    function renderWerewolfStep() {
+      const s = getActiveSession();
+      const livingPrey = s.players.filter(p => p.alive && p.roleKey !== 'werewolf');
+      const livingWolves = s.players.filter(p => p.alive && p.roleKey === 'werewolf').map(p => p.name).join(', ');
+
+      return `
+        <div>
+          <div class="flex items-center gap-1.5 mb-1.5">
+            <span class="text-xl">🐺</span>
+            <div>
+              <h3 class="font-cinzel text-xs font-bold text-rose-400">The Pack's Hunt</h3>
+              <p class="text-[10px] text-silver-400">Awake: ${livingWolves || 'None'}</p>
+            </div>
+          </div>
+          <div class="bg-obsidian-950/80 p-2 rounded-xl border border-silver-400/10 text-[11px] text-silver-300 mb-2 font-medieval italic">
+            "Werewolves, awaken. Acknowledge your pack and pick tonight's prey..."
+          </div>
+          <div class="grid grid-cols-2 gap-1.5 max-h-40 overflow-y-auto custom-scrollbar">
+            ${livingPrey.map(p => {
+              const active = s.nightTargets.werewolfVictimId === p.id;
+              const avatar = generateAvatarSvg(p.name, p.roleKey);
+              return `
+                <button onclick="selectWerewolfTarget('${p.id}')" class="p-2 rounded-xl border text-[11px] text-left truncate flex items-center justify-between ${active ? 'bg-rose-950/80 border-rose-500 text-rose-200 font-bold' : 'bg-obsidian-950/80 border-silver-400/10 text-silver-300'}">
+                  <div class="flex items-center gap-1.5 truncate">
+                    ${avatar}
+                    <span class="truncate">${p.name}</span>
+                  </div>
+                  ${active ? '🩸' : ''}
+                </button>
+              `;
+            }).join('')}
+          </div>
+        </div>
+        <div class="text-[10px] text-silver-400">
+          Ensure pack consensus before registering the kill.
+        </div>
+      `;
+    }
+
+    function selectWerewolfTarget(id) {
+      const s = getActiveSession();
+      if (!s) return;
+      s.nightTargets.werewolfVictimId = (s.nightTargets.werewolfVictimId === id) ? null : id;
+      if (s.nightTargets.werewolfVictimId) {
+        logEvent(`🐺 Wolves targeted ${getPlayerName(id)}.`);
+      }
+      renderNightStep();
+    }
+
+    /* Step: Bodyguard */
+    function renderBodyguardStep() {
+      const s = getActiveSession();
+      const living = s.players.filter(p => p.alive);
+      return `
+        <div>
+          <div class="flex items-center gap-1.5 mb-1.5">
+            <span class="text-xl">🛡️</span>
+            <div>
+              <h3 class="font-cinzel text-xs font-bold text-cyan-400">Bodyguard's Shield</h3>
+              <p class="text-[10px] text-silver-400">Select one player to ward from attacks</p>
+            </div>
+          </div>
+          <div class="bg-obsidian-950/80 p-2 rounded-xl border border-silver-400/10 text-[11px] text-silver-300 mb-2 font-medieval italic">
+            "Bodyguard, awaken. Point to the soul you protect tonight..."
+          </div>
+          <div class="grid grid-cols-2 gap-1.5 max-h-40 overflow-y-auto custom-scrollbar">
+            ${living.map(p => {
+              const active = s.nightTargets.protectedId === p.id;
+              const avatar = generateAvatarSvg(p.name, p.roleKey);
+              return `
+                <button onclick="selectBodyguardTarget('${p.id}')" class="p-2 rounded-xl border text-[11px] text-left truncate flex items-center justify-between ${active ? 'bg-cyan-950/80 border-cyan-500 text-cyan-200 font-bold' : 'bg-obsidian-950/80 border-silver-400/10 text-silver-300'}">
+                  <div class="flex items-center gap-1.5 truncate">
+                    ${avatar}
+                    <span class="truncate">${p.name}</span>
+                  </div>
+                  ${p.lastProtected ? '<span class="text-[8px] text-purple-400 font-bold">(Prior)</span>' : ''}
+                  ${active ? '🛡️' : ''}
+                </button>
+              `;
+            }).join('')}
+          </div>
+        </div>
+        <div class="text-[10px] text-silver-400">
+          Cannot protect the same target two consecutive nights!
+        </div>
+      `;
+    }
+
+    function selectBodyguardTarget(id) {
+      const s = getActiveSession();
+      if (!s) return;
+      s.nightTargets.protectedId = (s.nightTargets.protectedId === id) ? null : id;
+      if (s.nightTargets.protectedId) {
+        logEvent(`🛡️ Bodyguard warded ${getPlayerName(id)}.`);
+      }
+      renderNightStep();
+    }
+
+    /* Step: Witch */
+    function renderWitchStep() {
+      const s = getActiveSession();
+      const victim = s.players.find(p => p.id === s.nightTargets.werewolfVictimId);
+      const victimName = victim ? victim.name : 'Nobody';
+      const living = s.players.filter(p => p.alive);
+
+      return `
+        <div class="space-y-2">
+          <div class="flex items-center gap-1.5">
+            <span class="text-xl">🧪</span>
+            <div>
+              <h3 class="font-cinzel text-xs font-bold text-emerald-400">Witch's Potions</h3>
+              <p class="text-[10px] text-silver-400">Heal & Poison Alchemy</p>
+            </div>
+          </div>
+
+          <div class="bg-obsidian-950/80 p-2 rounded-xl border border-silver-400/10 text-[11px] text-silver-300 font-medieval italic">
+            "Witch, awaken. Victim tonight is <strong class="text-rose-400">${victimName}</strong>. Will you use Heal? Will you use Poison?"
+          </div>
+
+          <!-- Heal Option -->
+          <div class="bg-obsidian-950 p-2 rounded-xl border border-silver-400/15 flex items-center justify-between">
+            <div>
+              <div class="text-[11px] font-bold text-emerald-400 font-cinzel">Heal Potion</div>
+              <div class="text-[9px] text-silver-400">${s.witchPotions.healAvailable ? 'Available' : 'Expended'}</div>
+            </div>
+            <button onclick="toggleWitchHeal()" ${!s.witchPotions.healAvailable || !victim ? 'disabled' : ''} class="px-2.5 py-1 rounded-lg text-xs font-bold ${s.nightTargets.witchHealedVictim ? 'bg-emerald-600 text-white' : 'bg-obsidian-800 text-silver-300 disabled:opacity-30'}">
+              ${s.nightTargets.witchHealedVictim ? 'HEALING' : 'Heal'}
+            </button>
+          </div>
+
+          <!-- Poison Option -->
+          <div class="bg-obsidian-950 p-2 rounded-xl border border-silver-400/15 space-y-1">
+            <div class="flex items-center justify-between">
+              <div class="text-[11px] font-bold text-purple-400 font-cinzel">Poison Potion</div>
+              <div class="text-[9px] text-silver-400">${s.witchPotions.poisonAvailable ? 'Available' : 'Expended'}</div>
+            </div>
+
+            ${s.witchPotions.poisonAvailable ? `
+              <div class="grid grid-cols-2 gap-1 max-h-20 overflow-y-auto custom-scrollbar">
+                ${living.map(p => {
+                  const active = s.nightTargets.witchPoisonTargetId === p.id;
+                  const avatar = generateAvatarSvg(p.name, p.roleKey);
+                  return `
+                    <button onclick="toggleWitchPoison('${p.id}')" class="p-1 rounded-lg border text-[10px] text-left truncate flex items-center justify-between ${active ? 'bg-purple-950/80 border-purple-500 text-purple-200 font-bold' : 'bg-obsidian-900 border-silver-400/10 text-silver-400'}">
+                      <div class="flex items-center gap-1 truncate">
+                        ${avatar}
+                        <span class="truncate">${p.name}</span>
+                      </div>
+                      ${active ? '☠️' : ''}
+                    </button>
+                  `;
+                }).join('')}
+              </div>
+            ` : '<div class="text-[9px] text-slate-500 italic">Poison already expended.</div>'}
+          </div>
+        </div>
+      `;
+    }
+
+    function toggleWitchHeal() {
+      const s = getActiveSession();
+      if (!s) return;
+      s.nightTargets.witchHealedVictim = !s.nightTargets.witchHealedVictim;
+      logEvent(`🧪 Witch ${s.nightTargets.witchHealedVictim ? 'chose to HEAL' : 'cancelled heal on'} victim.`);
+      renderNightStep();
+    }
+
+    function toggleWitchPoison(id) {
+      const s = getActiveSession();
+      if (!s) return;
+      s.nightTargets.witchPoisonTargetId = (s.nightTargets.witchPoisonTargetId === id) ? null : id;
+      if (s.nightTargets.witchPoisonTargetId) {
+        logEvent(`🧪 Witch poisoned ${getPlayerName(id)}.`);
+      }
+      renderNightStep();
+    }
+
+    /* Custom Role Step */
+    function renderCustomRoleStep(roleKey, def) {
+      const s = getActiveSession();
+      const living = s.players.filter(p => p.alive);
+      const chosenId = s.nightTargets.customInteractions[roleKey];
+
+      return `
+        <div>
+          <div class="flex items-center gap-1.5 mb-1.5">
+            <span class="text-xl">${def.icon}</span>
+            <div>
+              <h3 class="font-cinzel text-xs font-bold text-ether-cyan">${def.name}</h3>
+              <p class="text-[10px] text-silver-400">Night Action</p>
+            </div>
+          </div>
+          <div class="bg-obsidian-950/80 p-2 rounded-xl border border-silver-400/10 text-[11px] text-silver-300 mb-1.5 font-medieval italic">
+            "${def.name}, awaken and perform your duty..."
+          </div>
+          <div class="bg-obsidian-900 p-2 rounded-xl border border-silver-400/15 text-[10px] text-silver-300 mb-2">
+            ${def.desc}
+          </div>
+
+          <div class="grid grid-cols-2 gap-1.5 max-h-32 overflow-y-auto custom-scrollbar">
+            ${living.map(p => {
+              const active = chosenId === p.id;
+              const avatar = generateAvatarSvg(p.name, p.roleKey);
+              return `
+                <button onclick="selectCustomTarget('${roleKey}', '${p.id}')" class="p-1.5 rounded-xl border text-[11px] text-left truncate flex items-center gap-1.5 ${active ? 'bg-cyan-950/80 border-cyan-500 text-cyan-200 font-bold' : 'bg-obsidian-950/80 border-silver-400/10 text-silver-300'}">
+                  ${avatar}
+                  <span class="truncate">${p.name}</span>
+                </button>
+              `;
+            }).join('')}
+          </div>
+        </div>
+        <div class="text-[10px] text-silver-400">
+          Acknowledge action silently, then command them to sleep.
+        </div>
+      `;
+    }
+
+    function selectCustomTarget(roleKey, playerId) {
+      const s = getActiveSession();
+      if (!s) return;
+      s.nightTargets.customInteractions[roleKey] = (s.nightTargets.customInteractions[roleKey] === playerId) ? null : playerId;
+      logEvent(`✨ ${s.roles[roleKey].name} targeted ${getPlayerName(playerId)}.`);
+      renderNightStep();
+    }
+
+    function nextNightStep() {
+      const s = getActiveSession();
+      if (!s) return;
+      if (s.currentStepIndex < s.activeNightSteps.length - 1) {
+        s.currentStepIndex++;
+        renderNightStep();
+      } else {
+        finalizeNightAndShowDawn();
+      }
+    }
+
+    function prevNightStep() {
+      const s = getActiveSession();
+      if (!s) return;
+      if (s.currentStepIndex > 0) {
+        s.currentStepIndex--;
+        renderNightStep();
+      }
+    }
+
+    /* -------------------------------------------------------------
+     * 13. DAWN RESOLUTION & CASUALTY REPORT
+     * ------------------------------------------------------------- */
+    function finalizeNightAndShowDawn() {
+      const s = getActiveSession();
+      if (!s) return;
+      const nt = s.nightTargets;
+      const casualties = new Set();
+
+      // Werewolf attack check against Bodyguard shield & Witch heal
+      if (nt.werewolfVictimId) {
+        const protectedByBodyguard = (nt.protectedId === nt.werewolfVictimId);
+        const healedByWitch = nt.witchHealedVictim;
+        if (!protectedByBodyguard && !healedByWitch) {
+          casualties.add(nt.werewolfVictimId);
+        }
+      }
+
+      // Witch actions
+      if (nt.witchHealedVictim) s.witchPotions.healAvailable = false;
+      if (nt.witchPoisonTargetId) {
+        casualties.add(nt.witchPoisonTargetId);
+        s.witchPotions.poisonAvailable = false;
+      }
+
+      // Save protection memory for bodyguard consecutive night check
+      s.players.forEach(p => {
+        p.lastProtected = (p.id === nt.protectedId);
+      });
+
+      // Lover collateral deaths
+      const initialCasualties = Array.from(casualties);
+      initialCasualties.forEach(deadId => {
+        const victim = s.players.find(p => p.id === deadId);
+        if (victim && victim.isLover) {
+          s.players.forEach(p => {
+            if (p.isLover && p.id !== deadId) {
+              casualties.add(p.id);
+              logEvent(`💔 ${p.name} died of grief following their lover!`);
+            }
+          });
+        }
+      });
+
+      nt.casualties = Array.from(casualties);
+      s.phase = 'DAWN';
+      switchTab('dawn');
+      renderDawnReport();
+      SoundEngine.bell();
+    }
+
+    function renderDawnReport() {
+      const s = getActiveSession();
+      if (!s) return;
+      const container = document.getElementById('dawnCasualtyReport');
+      const scriptEl = document.getElementById('gmAnnouncementScript');
+      const casualties = s.nightTargets.casualties;
+
+      if (casualties.length === 0) {
+        container.innerHTML = `
+          <div class="p-2.5 rounded-xl bg-cyan-950/50 border border-cyan-500/30 text-cyan-300 font-semibold text-xs flex items-center gap-2">
+            <span>🛡️</span>
+            <span>Miraculous night! The bodyguard and potions warded all lives.</span>
+          </div>
+        `;
+        scriptEl.innerText = `"The silver dawn rises upon our parish. The bells ring with joyful relief—not a single soul was lost in the shadows!"`;
+      } else {
+        container.innerHTML = casualties.map(id => {
+          const p = s.players.find(x => x.id === id);
+          const roleDef = s.roles[p.roleKey];
+          return `
+            <div class="p-2 rounded-xl bg-purple-950/50 border border-purple-500/30 flex items-center justify-between text-purple-200 text-xs">
+              <div class="flex items-center gap-2">
+                <span>☠️</span>
+                <span class="font-bold font-cinzel">${p.name}</span>
+                <span class="text-[10px] text-silver-400">(${roleDef ? roleDef.name : 'Unknown'})</span>
+              </div>
+              ${p.roleKey === 'hunter' ? '<span class="text-[9px] bg-amber-500/20 text-amber-300 px-1.5 py-0.5 rounded font-bold">🏹 Hunter Revenge Trigger!</span>' : ''}
+            </div>
+          `;
+        }).join('');
+
+        const names = casualties.map(id => s.players.find(x => x.id === id).name).join(' and ');
+        scriptEl.innerText = `"Dawn breaks, but cold silence grips the village. The creatures have claimed their prey: ${names} was discovered dead in their home!"`;
+      }
+    }
+
+    function copyNarration() {
+      const script = document.getElementById('gmAnnouncementScript').innerText;
+      const tempInput = document.createElement('textarea');
+      tempInput.value = script;
+      document.body.appendChild(tempInput);
+      tempInput.select();
+      document.execCommand('copy');
+      document.body.removeChild(tempInput);
+      showToast('Narration copied to clipboard');
+    }
+
+    function proceedToDay() {
+      const s = getActiveSession();
+      if (!s) return;
+      s.nightTargets.casualties.forEach(id => {
+        const p = s.players.find(x => x.id === id);
+        if (p) {
+          p.alive = false;
+          const roleName = s.roles[p.roleKey]?.name || 'Unknown';
+          logEvent(`⚰️ ${p.name} (${roleName}) perished Night ${s.dayNumber}.`);
+        }
+      });
+
+      if (checkWinConditions()) return;
+      startDayPhase();
+    }
+
+    /* -------------------------------------------------------------
+     * 14. DAY & VOTING
+     * ------------------------------------------------------------- */
+    function startDayPhase() {
+      const s = getActiveSession();
+      if (!s) return;
+      s.phase = 'DAY';
+      document.getElementById('dayNumberLabel').innerText = `Day ${s.dayNumber}`;
+      s.selectedLynchTargetId = null;
+      document.getElementById('btnConfirmLynch').disabled = true;
+
+      resetTimer();
+      renderLivingVoteList();
+      updateHeaderStats();
+      switchTab('day');
+    }
+
+    function renderLivingVoteList() {
+      const s = getActiveSession();
+      if (!s) return;
+      const container = document.getElementById('livingVoteList');
+      const living = s.players.filter(p => p.alive);
+
+      container.innerHTML = living.map(p => {
+        const active = s.selectedLynchTargetId === p.id;
+        const roleDef = s.roles[p.roleKey];
+        const avatar = generateAvatarSvg(p.name, p.roleKey);
+        return `
+          <button onclick="selectLynchTarget('${p.id}')" class="p-2 rounded-xl border text-[11px] text-left truncate flex items-center justify-between ${active ? 'bg-cyan-950/80 border-cyan-500 text-cyan-200 font-bold' : 'bg-obsidian-950/80 border-silver-400/10 text-silver-300'}">
+            <div class="flex items-center gap-1.5 truncate">
+              ${avatar}
+              <span class="truncate">${p.name}</span>
+            </div>
+            <span class="text-[10px] text-silver-400">${roleDef ? roleDef.icon : '❓'}</span>
+          </button>
+        `;
+      }).join('');
+    }
+
+    function selectLynchTarget(id) {
+      const s = getActiveSession();
+      if (!s) return;
+      s.selectedLynchTargetId = (s.selectedLynchTargetId === id) ? null : id;
+      document.getElementById('btnConfirmLynch').disabled = !s.selectedLynchTargetId;
+      renderLivingVoteList();
+    }
+
+    function executeSelectedLynch() {
+      const s = getActiveSession();
+      if (!s || !s.selectedLynchTargetId) return;
+      const victim = s.players.find(p => p.id === s.selectedLynchTargetId);
+      if (!victim) return;
+
+      victim.alive = false;
+      const roleDef = s.roles[victim.roleKey];
+      logEvent(`⚖️ Town council executed ${victim.name} (${roleDef ? roleDef.name : 'Unknown'}).`);
+      showToast(`${victim.name} executed`);
+
+      if (victim.roleKey === 'tanner') {
+        announceVictory('🎭 TANNER SOLO VICTORY!', `${victim.name} was the Tanner and deceived the town into executing them!`);
+        return;
+      }
+
+      if (victim.isLover) {
+        s.players.forEach(p => {
+          if (p.isLover && p.alive) {
+            p.alive = false;
+            logEvent(`💔 ${p.name} died of grief following their lover!`);
+            showToast(`${p.name} died of heartbreak!`);
+          }
+        });
+      }
+
+      if (checkWinConditions()) return;
+
+      if (victim.roleKey === 'hunter') {
+        showToast('🏹 Hunter eliminated! Prompt them for their revenge shot!');
+      }
+
+      startNightPhase(s.dayNumber + 1);
+    }
+
+    function skipDayLynch() {
+      const s = getActiveSession();
+      if (!s) return;
+      logEvent(`⚖️ Town council pardoned all suspects on Day ${s.dayNumber}.`);
+      showToast('No execution today.');
+      startNightPhase(s.dayNumber + 1);
+    }
+
+    /* -------------------------------------------------------------
+     * 15. DISCUSSION TIMER
+     * ------------------------------------------------------------- */
+    let timerInterval = null;
+    function toggleTimer() {
+      const s = getActiveSession();
+      if (!s) return;
+      if (s.timerRunning) pauseTimer();
+      else runTimer();
+    }
+
+    function runTimer() {
+      const s = getActiveSession();
+      if (!s) return;
+      s.timerRunning = true;
+      document.getElementById('timerBtnText').innerText = 'Pause';
+      document.getElementById('btnTimerToggle').className = 'flex-1 bg-gradient-to-r from-cyan-600 to-purple-600 text-white text-xs font-bold py-2 rounded-xl active:scale-95 shadow flex items-center justify-center gap-1';
+
+      const icon = document.getElementById('timerIcon');
+      if (icon) icon.setAttribute('data-lucide', 'pause');
+
+      clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        if (s.timerSeconds > 0) {
+          s.timerSeconds--;
+          updateTimerUI();
+          if (s.timerSeconds <= 5 && s.timerSeconds > 0) {
+            SoundEngine.beep(false);
+          } else if (s.timerSeconds === 0) {
+            SoundEngine.bell();
+            pauseTimer();
+            showToast('Discussion time elapsed! Commence votes!');
+          }
+        }
+      }, 1000);
+      refreshIcons();
+    }
+
+    function pauseTimer() {
+      const s = getActiveSession();
+      if (!s) return;
+      s.timerRunning = false;
+      clearInterval(timerInterval);
+      document.getElementById('timerBtnText').innerText = 'Resume';
+      document.getElementById('btnTimerToggle').className = 'flex-1 bg-obsidian-800 hover:bg-obsidian-700 text-silver-200 text-xs font-bold py-2 rounded-xl active:scale-95 shadow flex items-center justify-center gap-1 border border-silver-400/20';
+
+      const icon = document.getElementById('timerIcon');
+      if (icon) icon.setAttribute('data-lucide', 'play');
+      refreshIcons();
+    }
+
+    function resetTimer() {
+      const s = getActiveSession();
+      if (!s) return;
+      pauseTimer();
+      s.timerSeconds = 180;
+      updateTimerUI();
+      document.getElementById('timerBtnText').innerText = 'Start Timer';
+      refreshIcons();
+    }
+
+    function addTimerSeconds(sec) {
+      const s = getActiveSession();
+      if (!s) return;
+      s.timerSeconds += sec;
+      updateTimerUI();
+    }
+
+    function updateTimerUI() {
+      const s = getActiveSession();
+      if (!s) return;
+      const min = Math.floor(s.timerSeconds / 60);
+      const sec = s.timerSeconds % 60;
+      document.getElementById('timerDisplay').innerText = `${String(min).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
+    }
+
+    /* -------------------------------------------------------------
+     * 16. WIN CONDITIONS & HUD
+     * ------------------------------------------------------------- */
+    function checkWinConditions() {
+      const s = getActiveSession();
+      if (!s) return false;
+      const living = s.players.filter(p => p.alive);
+      const livingWolves = living.filter(p => s.roles[p.roleKey]?.team === 'werewolf');
+      const livingGood = living.filter(p => s.roles[p.roleKey]?.team === 'village');
+
+      // Lovers solo win
+      const livingLovers = living.filter(p => p.isLover);
+      if (living.length === 2 && livingLovers.length === 2) {
+        announceVictory('💘 LOVERS VICTORY!', 'The two bound lovers eliminated all rivals and survive together!');
+        return true;
+      }
+
+      // Village win
+      if (livingWolves.length === 0) {
+        announceVictory('🎉 VILLAGE WINS!', 'All terrifying werewolves have been wiped out!');
+        return true;
+      }
+
+      // Werewolves win
+      if (livingWolves.length >= livingGood.length) {
+        announceVictory('🐺 WEREWOLVES WIN!', 'The pack outnumbers the remaining parish! Darkness claims victory.');
+        return true;
+      }
+
+      return false;
+    }
+
+    function announceVictory(title, desc) {
+      document.getElementById('victoryTitle').innerText = title;
+      document.getElementById('victoryDescription').innerText = desc;
+      openModal('victoryModal');
+      SoundEngine.howl();
+      switchTab('roster');
+    }
+
+    function updateHeaderStats() {
+      const s = getActiveSession();
+      if (!s) return;
+      const badge = document.getElementById('hudPhaseBadge');
+      if (s.phase === 'SETUP') {
+        badge.innerText = 'Setup';
+        badge.className = 'text-[9px] px-1.5 py-0.2 rounded bg-cyan-950 text-cyan-300 font-sans uppercase font-bold border border-cyan-500/30';
+      } else if (s.phase === 'NIGHT') {
+        badge.innerText = `Night ${s.dayNumber}`;
+        badge.className = 'text-[9px] px-1.5 py-0.2 rounded bg-purple-950 text-purple-300 font-sans uppercase font-bold border border-purple-500/30';
+      } else if (s.phase === 'DAY') {
+        badge.innerText = `Day ${s.dayNumber}`;
+        badge.className = 'text-[9px] px-1.5 py-0.2 rounded bg-cyan-950 text-cyan-300 font-sans uppercase font-bold border border-cyan-500/30';
+      }
+    }
+
+    function renderFullRosterView() {
+      const s = getActiveSession();
+      if (!s) return;
+      const container = document.getElementById('fullRosterList');
+      const livingWolves = s.players.filter(p => p.alive && s.roles[p.roleKey]?.team === 'werewolf').length;
+      const livingGood = s.players.filter(p => p.alive && s.roles[p.roleKey]?.team !== 'werewolf').length;
+      document.getElementById('rosterFactionRatio').innerText = `🐺 ${livingWolves} vs 🧑 ${livingGood}`;
+
+      container.innerHTML = s.players.map((p, i) => {
+        const roleDef = s.roles[p.roleKey] || { name: 'Unassigned', icon: '❓', color: 'text-silver-400' };
+        const avatar = generateAvatarSvg(p.name, p.roleKey);
+        return `
+          <div class="p-2 rounded-xl border flex items-center justify-between ${p.alive ? 'bg-obsidian-950/90 border-silver-400/15' : 'bg-purple-950/20 border-purple-900/40 opacity-50'}">
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-mono text-silver-500">${i + 1}.</span>
+              ${avatar}
+              <div>
+                <div class="text-xs font-semibold flex items-center gap-1 font-cinzel ${p.alive ? 'text-white' : 'line-through text-silver-400'}">
+                  ${p.name}
+                  ${p.isLover ? '<span>❤️</span>' : ''}
+                </div>
+                <div class="text-[9px] ${roleDef.color} flex items-center gap-0.5 font-medieval">
+                  <span>${roleDef.icon}</span>
+                  <span>${roleDef.name}</span>
+                </div>
+              </div>
+            </div>
+            <button onclick="togglePlayerLivingManual('${p.id}')" class="px-2 py-0.5 rounded text-[10px] font-bold ${p.alive ? 'bg-cyan-950 text-cyan-400 border border-cyan-500/30' : 'bg-purple-950 text-purple-400 border border-purple-500/30'}">
+              ${p.alive ? 'Alive' : 'Dead'}
+            </button>
+          </div>
+        `;
+      }).join('');
+      refreshIcons();
+    }
+
+    function togglePlayerLivingManual(id) {
+      const s = getActiveSession();
+      if (!s) return;
+      const p = s.players.find(x => x.id === id);
+      if (p) {
+        p.alive = !p.alive;
+        logEvent(`⚙️ GM manually toggled ${p.name} to ${p.alive ? 'Alive' : 'Dead'}.`);
+        renderFullRosterView();
+        updateHeaderStats();
+        checkWinConditions();
+      }
+    }
+
+    function logEvent(msg) {
+      const s = getActiveSession();
+      if (!s) return;
+      const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      s.historyLog.unshift(`[${time}] ${msg}`);
+      const logContainer = document.getElementById('gameLogContainer');
+      if (logContainer) {
+        logContainer.innerHTML = s.historyLog.map(line => `<div>${line}</div>`).join('');
+      }
+    }
+
+    function getPlayerName(id) {
+      const s = getActiveSession();
+      if (!s) return 'Unknown';
+      const p = s.players.find(x => x.id === id);
+      return p ? p.name : 'Unknown';
+    }
+
+    /* -------------------------------------------------------------
+     * 17. TABS & MODALS
+     * ------------------------------------------------------------- */
+    function switchTab(tab) {
+      const views = {
+        setup: document.getElementById('subviewSetup'),
+        night: document.getElementById('subviewNight'),
+        dawn: document.getElementById('subviewDawn'),
+        day: document.getElementById('subviewDay'),
+        roster: document.getElementById('subviewRoster')
+      };
+
+      Object.values(views).forEach(v => v.classList.add('hidden'));
+
+      if (tab === 'setup') views.setup.classList.remove('hidden');
+      if (tab === 'night') views.night.classList.remove('hidden');
+      if (tab === 'dawn') views.dawn.classList.remove('hidden');
+      if (tab === 'day') views.day.classList.remove('hidden');
+      if (tab === 'roster') {
+        views.roster.classList.remove('hidden');
+        renderFullRosterView();
+      }
+
+      ['tabSetup', 'tabNight', 'tabDay', 'tabRoster'].forEach(id => {
+        const btn = document.getElementById(id);
+        if (btn) btn.className = 'flex flex-col items-center gap-0.5 py-1 px-3 rounded-xl transition-colors text-silver-400 font-semibold';
+      });
+
+      const activeBtnMap = { setup: 'tabSetup', night: 'tabNight', day: 'tabDay', roster: 'tabRoster' };
+      if (activeBtnMap[tab]) {
+        document.getElementById(activeBtnMap[tab]).className = 'flex flex-col items-center gap-0.5 py-1 px-3 rounded-xl transition-colors text-ether-cyan font-bold';
+      }
+
+      updateHeaderStats();
+      refreshIcons();
+    }
+
+    function openModal(id) {
+      document.getElementById(id).classList.remove('hidden');
+      refreshIcons();
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.add('hidden');
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      toast.innerText = msg;
+      toast.classList.remove('hidden');
+      setTimeout(() => toast.classList.add('hidden'), 2200);
+    }
+
+    function refreshIcons() {
+      if (window.lucide) lucide.createIcons();
+    }
+
+    /* -------------------------------------------------------------
+     * 18. APP INITIALIZATION
+     * ------------------------------------------------------------- */
+    window.addEventListener('DOMContentLoaded', () => {
+      initThreeAmbience();
+      const defaultSession = createSessionObject('Paskong Pinoy 12-Player');
+      REQUESTED_12_PLAYERS.forEach(name => {
+        defaultSession.players.push({
+          id: 'p_' + Date.now() + '_' + Math.floor(Math.random() * 1000),
+          name: name,
+          roleKey: null,
+          alive: true,
+          isLover: false,
+          lastProtected: false
+        });
+      });
+      AppData.sessions.push(defaultSession);
+      AppData.activeSessionId = defaultSession.id;
+      refreshIcons();
+    });
+  </script>
+</body>
+</html>
