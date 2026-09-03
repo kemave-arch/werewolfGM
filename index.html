@@ -61,17 +61,8 @@
       left: 0;
       width: 100vw;
       height: 100vh;
-      z-index: 1;
+      z-index: 2;
       pointer-events: none;
-    }
-    /* Artwork Background container */
-    .paskong-artwork-bg {
-      background-image: 
-        linear-gradient(180deg, rgba(3, 5, 8, 0.45) 0%, rgba(3, 5, 8, 0.15) 35%, rgba(3, 5, 8, 0.7) 75%, rgba(3, 5, 8, 0.95) 100%),
-        url('Werewolf%20GPT.png');
-      background-size: cover;
-      background-position: center top;
-      background-repeat: no-repeat;
     }
     .custom-scrollbar::-webkit-scrollbar {
       width: 4px;
@@ -81,7 +72,7 @@
       border-radius: 4px;
     }
     .glass-card {
-      background: rgba(11, 18, 30, 0.72);
+      background: rgba(11, 18, 30, 0.75);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
       border: 1px solid rgba(226, 232, 240, 0.14);
@@ -100,12 +91,31 @@
 </head>
 <body class="text-silver-200 font-sans min-h-screen flex flex-col antialiased relative overflow-x-hidden">
 
+  <!-- ================= RESPONSIVE BACKGROUND ARTWORK LAYER ================= -->
+  <!-- Scaled precisely for Mobile, Tablet & PC Desktop -->
+  <div id="artBackgroundContainer" class="fixed inset-0 z-0 pointer-events-none transition-opacity duration-700 overflow-hidden flex items-center justify-center">
+    <!-- Wide Screen / Desktop Ambient Backdrop: fills margins on PC & Tablet without stretching the art -->
+    <div id="desktopAmbientBg" class="absolute inset-0 bg-cover bg-center filter blur-3xl opacity-35 scale-110" 
+         style="background-image: url('Werewolf%20GPT.png');"></div>
+    <div class="absolute inset-0 bg-obsidian-950/60 hidden sm:block"></div>
+
+    <!-- Center Stage Container: Preserves 9:19 portrait composition on any device -->
+    <div class="relative w-full h-full max-w-md sm:max-w-lg mx-auto flex items-center justify-center overflow-hidden shadow-2xl">
+      <img src="Werewolf%20GPT.png" alt="Werewolf Paskong Pinoy Artwork" 
+        class="w-full h-full object-cover object-top filter brightness-95"
+        onerror="this.style.opacity='0'" />
+      
+      <!-- Vignette Gradients for Legibility -->
+      <div class="absolute inset-0 bg-gradient-to-b from-obsidian-950/80 via-transparent via-40% to-obsidian-950/95"></div>
+      <div class="absolute inset-0 bg-gradient-to-t from-obsidian-950 via-transparent via-30% to-transparent opacity-90"></div>
+    </div>
+  </div>
+
   <!-- Three.js Floating Ambient Particle Motes Canvas -->
   <canvas id="three-bg-canvas"></canvas>
 
   <!-- ================= SCREEN 0: CINEMATIC TITLE SCREEN ================= -->
-  <section id="screenTitle" class="relative z-10 min-h-screen paskong-artwork-bg flex flex-col items-center justify-between p-5 text-center transition-opacity duration-500">
-    <!-- Top Bar Framing the Moon -->
+  <section id="screenTitle" class="relative z-10 min-h-screen flex flex-col items-center justify-between p-5 text-center transition-opacity duration-500 max-w-md sm:max-w-lg mx-auto w-full">
     <div class="pt-6 space-y-2">
       <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-ether-cyan/40 bg-obsidian-950/80 backdrop-blur text-[10px] uppercase font-bold tracking-widest text-ether-cyan shadow-lg">
         <span>🎄</span> <span>Paskong Pinoy Grimoire</span>
@@ -120,7 +130,7 @@
 
     <!-- Center View Area (Clear View of the Illustrated Village & Council) -->
     <div class="w-full max-w-xs flex flex-col items-center justify-center my-auto py-8">
-      <div class="px-4 py-2 rounded-2xl bg-obsidian-950/50 backdrop-blur-md border border-silver-400/20 shadow-2xl flex items-center gap-2 animate-pulse">
+      <div class="px-4 py-2 rounded-2xl bg-obsidian-950/60 backdrop-blur-md border border-silver-400/20 shadow-2xl flex items-center gap-2 animate-pulse">
         <span class="w-2 h-2 rounded-full bg-ether-cyan shadow-lg shadow-cyan-400/80"></span>
         <span class="font-cinzel text-[11px] text-silver-200 tracking-wider">12 Souls Gathering Tonight</span>
       </div>
@@ -139,9 +149,8 @@
   </section>
 
   <!-- ================= SCREEN 1: SESSIONS MANAGER ================= -->
-  <section id="screenMenu" class="hidden relative z-10 min-h-screen paskong-artwork-bg flex flex-col p-4 max-w-md mx-auto w-full transition-opacity duration-500">
-    <!-- Header -->
-    <div class="flex items-center justify-between border-b border-silver-400/20 pb-3 mb-4 bg-obsidian-950/60 p-3 rounded-2xl backdrop-blur-md border">
+  <section id="screenMenu" class="hidden relative z-10 min-h-screen flex flex-col p-4 max-w-md sm:max-w-lg mx-auto w-full transition-opacity duration-500">
+    <div class="flex items-center justify-between border-b border-silver-400/20 pb-3 mb-4 bg-obsidian-950/70 p-3 rounded-2xl backdrop-blur-md border border-silver-400/20 shadow-xl">
       <div>
         <h2 class="font-gothic text-base text-silver-100 font-bold tracking-wide">VILLAGE CHRONICLES</h2>
         <p class="text-[10px] text-silver-400">Select or forge an active session</p>
@@ -151,7 +160,6 @@
       </button>
     </div>
 
-    <!-- Create Session Card -->
     <div class="glass-card rounded-2xl p-4 mb-4 border border-ether-cyan/40 shadow-xl space-y-2.5">
       <div class="flex items-center justify-between">
         <span class="text-xs font-cinzel font-bold text-ether-cyan flex items-center gap-1.5">
@@ -168,14 +176,13 @@
       </div>
     </div>
 
-    <!-- Sessions List -->
     <div class="flex-1 space-y-2.5 overflow-y-auto custom-scrollbar pb-6" id="sessionsListContainer">
       <!-- Populated by JS -->
     </div>
   </section>
 
-  <!-- ================= ACTIVE GAME SESSION HUD & MAIN CONTENT ================= -->
-  <div id="activeGameWrapper" class="hidden relative z-10 min-h-screen flex flex-col bg-obsidian-950/90">
+  <!-- ================= ACTIVE GAME SESSION ROOT WRAPPER ================= -->
+  <div id="activeGameWrapper" class="hidden relative z-10 min-h-screen flex flex-col bg-obsidian-950/95">
     <!-- Header HUD -->
     <header class="sticky top-0 z-30 bg-obsidian-950/95 backdrop-blur-md border-b border-silver-400/15 px-3.5 py-2 flex items-center justify-between shadow-xl">
       <div class="flex items-center gap-2">
@@ -209,83 +216,129 @@
       </div>
     </header>
 
-    <!-- Main Active Viewport -->
-    <main class="flex-1 overflow-y-auto px-3.5 py-3 max-w-md mx-auto w-full pb-20" id="gameViewContainer">
+    <!-- Main View Container -->
+    <main class="flex-1 overflow-y-auto px-3 py-3 max-w-md mx-auto w-full pb-20" id="gameViewContainer">
 
-      <!-- ================= PHASE 1: SETUP & 12-PLAYER PRESET ================= -->
-      <section id="subviewSetup" class="space-y-3.5">
-        <!-- Preset / Catalog Bar -->
-        <div class="glass-card rounded-2xl p-2.5 shadow-lg flex items-center justify-between border-ether-cyan/20">
-          <div class="truncate mr-2">
-            <div class="text-[9px] uppercase font-bold tracking-wider text-ether-cyan font-cinzel">Current Card Deck</div>
-            <div class="text-xs text-silver-100 font-semibold truncate" id="currentPresetName">12-Player Gathering</div>
-          </div>
-          <div class="flex items-center gap-1.5 flex-shrink-0">
-            <button onclick="openModal('presetSelectModal')" class="bg-obsidian-800 hover:bg-obsidian-700 text-silver-200 p-2 rounded-xl border border-silver-400/20 active:scale-95 flex items-center gap-1 text-xs">
-              <i data-lucide="layers" class="w-3.5 h-3.5 text-ether-cyan"></i>
-              <span class="text-[11px] font-medium">Presets</span>
-            </button>
-            <button onclick="openRoleManagerModal()" class="bg-ether-purple/80 hover:bg-ether-purple text-white p-2 rounded-xl active:scale-95 shadow flex items-center gap-1 text-xs">
-              <i data-lucide="sliders" class="w-3.5 h-3.5"></i>
-              <span class="text-[11px] font-bold">Roles</span>
-            </button>
-          </div>
+      <!-- ================= PHASE 1: SESSION SETUP (2 SUB-TABS) ================= -->
+      <section id="subviewSetup" class="space-y-3">
+        
+        <!-- Segmented Tab Switcher: Deck Setup vs Player Setup -->
+        <div class="grid grid-cols-2 p-1 rounded-2xl bg-obsidian-900 border border-silver-400/20 shadow-lg text-xs font-cinzel font-bold">
+          <button onclick="switchSetupSubTab('deck')" id="btnSubTabDeck" class="py-2 rounded-xl flex items-center justify-center gap-1.5 transition-all bg-gradient-to-r from-cyan-600 to-purple-600 text-white shadow">
+            <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+            <span>Deck Setup (<span id="setupDeckCardTotal">0</span>)</span>
+          </button>
+          <button onclick="switchSetupSubTab('players')" id="btnSubTabPlayers" class="py-2 rounded-xl flex items-center justify-center gap-1.5 transition-all text-silver-400 hover:text-white">
+            <i data-lucide="users" class="w-3.5 h-3.5"></i>
+            <span>Player Setup (<span id="setupPlayerTotal">0</span>)</span>
+          </button>
         </div>
 
-        <!-- Players Roster (With Custom 12-Player Button) -->
-        <div class="glass-card rounded-2xl p-3 shadow-xl space-y-2">
-          <div class="flex justify-between items-center">
-            <h2 class="font-cinzel text-xs font-bold text-silver-100 flex items-center gap-1.5">
-              <i data-lucide="users" class="w-3.5 h-3.5 text-ether-cyan"></i>
-              <span>Players (<span id="playerCount">0</span>)</span>
-            </h2>
-            <button onclick="quickAddYourTwelvePlayers()" class="text-[11px] text-ether-glow hover:underline font-semibold flex items-center gap-1">
-              <i data-lucide="user-plus" class="w-3 h-3"></i>
-              <span>+12 Presets</span>
-            </button>
+        <!-- ---------------- SUB-TAB A: DECK SETUP (CARD VIEW WITH NANOBANANA SPRITES) ---------------- -->
+        <div id="setupTabContentDeck" class="space-y-3">
+          
+          <!-- Preset & Custom Role Header Bar -->
+          <div class="glass-card rounded-2xl p-2.5 shadow-lg flex items-center justify-between border-ether-cyan/20">
+            <div class="truncate mr-2">
+              <div class="text-[9px] uppercase font-bold tracking-wider text-ether-cyan font-cinzel">Active Catalog</div>
+              <div class="text-xs text-silver-100 font-semibold truncate" id="currentPresetName">12-Player Gathering</div>
+            </div>
+            <div class="flex items-center gap-1.5 flex-shrink-0">
+              <button onclick="openModal('presetSelectModal')" class="bg-obsidian-800 hover:bg-obsidian-700 text-silver-200 p-2 rounded-xl border border-silver-400/20 active:scale-95 flex items-center gap-1 text-xs">
+                <i data-lucide="layers" class="w-3.5 h-3.5 text-ether-cyan"></i>
+                <span class="text-[11px] font-medium">Presets</span>
+              </button>
+              <button onclick="openRoleManagerModal()" class="bg-ether-purple/80 hover:bg-ether-purple text-white p-2 rounded-xl active:scale-95 shadow flex items-center gap-1 text-xs">
+                <i data-lucide="sliders" class="w-3.5 h-3.5"></i>
+                <span class="text-[11px] font-bold">Custom</span>
+              </button>
+            </div>
           </div>
 
-          <div class="flex gap-1.5">
-            <input id="newPlayerName" type="text" placeholder="Add custom player..." 
-              class="flex-1 bg-obsidian-950/90 border border-silver-400/20 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-ether-cyan"
-              onkeydown="if(event.key==='Enter') addPlayer()">
-            <button onclick="addPlayer()" class="bg-gradient-to-r from-cyan-600 to-purple-600 hover:opacity-95 text-white px-3 py-2 rounded-xl active:scale-95 transition-transform shadow flex items-center justify-center">
-              <i data-lucide="plus" class="w-4 h-4"></i>
-            </button>
-          </div>
-
-          <div id="playerChipsContainer" class="flex flex-wrap gap-1.5 max-h-40 overflow-y-auto custom-scrollbar pt-1">
-            <!-- Injected by JS -->
-          </div>
-        </div>
-
-        <!-- Role Quantities -->
-        <div class="glass-card rounded-2xl p-3 shadow-xl space-y-2.5">
-          <div class="flex justify-between items-center">
-            <h2 class="font-cinzel text-xs font-bold text-silver-100 flex items-center gap-1.5">
-              <i data-lucide="sparkles" class="w-3.5 h-3.5 text-ether-purple"></i>
-              <span>Deck Quantities</span>
-            </h2>
-            <span id="roleCountMatch" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-800 text-silver-300 border border-silver-400/20">
+          <!-- Total Role Count Alert Banner -->
+          <div class="glass-card rounded-2xl p-2.5 flex items-center justify-between border-silver-400/15">
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-cinzel text-silver-300 font-bold">Deck Balance:</span>
+              <span id="deckCardStatusText" class="text-xs font-bold text-ether-cyan">0 Cards</span>
+            </div>
+            <span id="roleCountMatch" class="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-slate-800 text-silver-300 border border-silver-400/20">
               0 / 0
             </span>
           </div>
-          <div class="grid grid-cols-2 gap-1.5 text-xs" id="rolesSelectorGrid">
-            <!-- Injected by JS -->
+
+          <!-- Card View with Nanobanana Sprites Grid -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5" id="deckCardViewGrid">
+            <!-- Rendered dynamically by JS with Nanobanana SVG Sprites -->
+          </div>
+
+          <!-- Re-order Steps Shortcut -->
+          <button onclick="openOrderManagerModal()" class="w-full bg-obsidian-850 border border-silver-400/20 hover:bg-obsidian-800 text-silver-200 text-xs font-cinzel font-bold py-2.5 rounded-xl active:scale-95 flex items-center justify-center gap-1.5 shadow">
+            <i data-lucide="arrow-up-down" class="w-3.5 h-3.5 text-ether-cyan"></i>
+            <span>Customize Night Sequence Order</span>
+          </button>
+        </div>
+
+        <!-- ---------------- SUB-TAB B: PLAYER SETUP & QUICK TABLE (CRUD + ROLE DROPDOWNS) ---------------- -->
+        <div id="setupTabContentPlayers" class="hidden space-y-3">
+          
+          <!-- Roster Controls & Quick Preset -->
+          <div class="glass-card rounded-2xl p-3 shadow-xl space-y-2.5">
+            <div class="flex justify-between items-center">
+              <h3 class="font-cinzel text-xs font-bold text-silver-100 flex items-center gap-1.5">
+                <i data-lucide="user-plus" class="w-3.5 h-3.5 text-ether-cyan"></i>
+                <span>Enlist Villagers</span>
+              </h3>
+              <button onclick="quickAddYourTwelvePlayers()" class="text-[11px] text-ether-glow hover:underline font-semibold flex items-center gap-1">
+                <i data-lucide="sparkles" class="w-3 h-3 text-ether-cyan"></i>
+                <span>Reset 12 Presets</span>
+              </button>
+            </div>
+
+            <!-- Create New Player Input -->
+            <div class="flex gap-1.5">
+              <input id="newPlayerName" type="text" placeholder="Add custom player name..." 
+                class="flex-1 bg-obsidian-950/90 border border-silver-400/20 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-ether-cyan shadow-inner"
+                onkeydown="if(event.key==='Enter') addPlayer()">
+              <button onclick="addPlayer()" class="bg-gradient-to-r from-cyan-600 to-purple-600 hover:opacity-95 text-white px-3 py-2 rounded-xl active:scale-95 transition-transform shadow flex items-center justify-center">
+                <i data-lucide="plus" class="w-4 h-4"></i>
+              </button>
+            </div>
+
+            <div class="flex items-center justify-between pt-1 text-[10px] text-silver-400">
+              <span>Remaining deck cards to assign: <strong id="remainingDeckBadge" class="text-ether-cyan">0</strong></span>
+              <button onclick="autoDistributeDeck()" class="text-ether-glow hover:underline font-bold">
+                Auto-Deal Remaining
+              </button>
+            </div>
+          </div>
+
+          <!-- Quick CRUD Table of Players & Dynamic Role Dropdown -->
+          <div class="glass-card rounded-2xl shadow-xl border-silver-400/15 overflow-hidden">
+            <div class="overflow-x-auto custom-scrollbar">
+              <table class="w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr class="border-b border-silver-400/20 bg-obsidian-900/90 text-silver-400 font-cinzel text-[10px] uppercase tracking-wider">
+                    <th class="py-2.5 px-3">#</th>
+                    <th class="py-2.5 px-2">Player</th>
+                    <th class="py-2.5 px-2">Assigned Role</th>
+                    <th class="py-2.5 px-2 text-right">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="playerTableBody" class="divide-y divide-silver-400/10">
+                  <!-- Injected by JS -->
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
 
-        <!-- Custom Order Button -->
-        <button onclick="openOrderManagerModal()" class="w-full bg-obsidian-800 border border-silver-400/20 hover:bg-obsidian-700 text-silver-200 text-xs font-cinzel font-bold py-2.5 rounded-xl active:scale-95 flex items-center justify-center gap-1.5 shadow">
-          <i data-lucide="arrow-up-down" class="w-3.5 h-3.5 text-ether-cyan"></i>
-          <span>Customize Night Sequence</span>
-        </button>
-
-        <!-- Start CTA -->
-        <button onclick="startGame()" id="btnStartGame" class="w-full bg-gradient-to-r from-cyan-600 via-purple-600 to-cyan-600 hover:opacity-95 text-white font-cinzel font-bold text-xs py-3.5 rounded-2xl shadow-2xl active:scale-98 transition-all flex items-center justify-center gap-1.5 glow-cyan">
-          <i data-lucide="moon" class="w-4 h-4 text-ether-glow"></i>
-          <span>COMMENCE NIGHT 1</span>
-        </button>
+        <!-- Start Game CTA Button (Available from both tabs) -->
+        <div class="pt-1">
+          <button onclick="startGame()" id="btnStartGame" class="w-full bg-gradient-to-r from-cyan-600 via-purple-600 to-cyan-600 hover:opacity-95 text-white font-cinzel font-bold text-xs py-3.5 rounded-2xl shadow-2xl active:scale-98 transition-all flex items-center justify-center gap-1.5 glow-cyan">
+            <i data-lucide="moon" class="w-4 h-4 text-ether-glow"></i>
+            <span>COMMENCE NIGHT 1</span>
+          </button>
+        </div>
       </section>
 
       <!-- ================= PHASE 2: NIGHT FLOW WITH TARGETING ================= -->
@@ -296,7 +349,6 @@
           <p class="text-[11px] text-silver-400 font-medieval italic">"Close your eyes, villagers of the realm..."</p>
         </div>
 
-        <!-- Stepper Indicators -->
         <div class="flex items-center justify-between text-[10px] font-semibold text-silver-400 px-1">
           <div class="flex items-center gap-1">
             <span>Turn <span id="nightStepIndex">1</span>/<span id="nightTotalSteps">5</span></span>
@@ -309,12 +361,10 @@
           </button>
         </div>
 
-        <!-- Active Targeting Card -->
         <div id="nightStepCard" class="glass-card rounded-2xl p-3.5 shadow-2xl space-y-3 min-h-[310px] flex flex-col justify-between border-silver-400/20">
           <!-- Dynamic Step Content -->
         </div>
 
-        <!-- Prev / Next Navigation -->
         <div class="grid grid-cols-2 gap-2 pt-0.5">
           <button onclick="prevNightStep()" id="btnPrevNight" class="py-2.5 px-3 rounded-xl bg-obsidian-800 hover:bg-obsidian-700 text-silver-300 font-semibold text-xs active:scale-95 shadow flex items-center justify-center gap-1 border border-silver-400/15">
             <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
@@ -363,7 +413,6 @@
 
       <!-- ================= PHASE 4: DAY DISCUSSION & LYNCH ================= -->
       <section id="subviewDay" class="hidden space-y-3">
-        <!-- Timer -->
         <div class="glass-card rounded-2xl p-3 shadow-xl border-silver-400/15">
           <div class="flex items-center justify-between mb-2">
             <div>
@@ -388,7 +437,6 @@
           </div>
         </div>
 
-        <!-- Execution Verdict Tool -->
         <div class="glass-card rounded-2xl p-3 shadow-xl space-y-2.5 border-silver-400/15">
           <div class="flex justify-between items-center">
             <h3 class="font-cinzel text-xs font-bold text-silver-100 flex items-center gap-1.5">
@@ -464,6 +512,28 @@
   </div>
 
   <!-- ================= MODALS ================= -->
+
+  <!-- MODAL: EDIT PLAYER NAME -->
+  <div id="editPlayerNameModal" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="glass-card bg-obsidian-950 border border-silver-400/20 rounded-3xl p-4 max-w-xs w-full space-y-3 shadow-2xl">
+      <div class="flex justify-between items-center border-b border-silver-400/15 pb-1.5">
+        <h3 class="font-cinzel text-xs font-bold text-silver-100">Edit Player Name</h3>
+        <button onclick="closeModal('editPlayerNameModal')" class="p-1 text-silver-400 hover:text-white">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+      <input type="hidden" id="editPlayerTargetId">
+      <input type="text" id="editPlayerNameInput" class="w-full bg-obsidian-900 border border-silver-400/20 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-ether-cyan">
+      <div class="flex gap-2 pt-1">
+        <button onclick="savePlayerNameEdit()" class="flex-1 bg-gradient-to-r from-cyan-600 to-purple-600 hover:opacity-95 text-white font-bold py-2 rounded-xl text-xs active:scale-95 shadow">
+          Save Name
+        </button>
+        <button onclick="closeModal('editPlayerNameModal')" class="px-3 bg-obsidian-800 text-silver-400 font-medium py-2 rounded-xl text-xs active:scale-95">
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
 
   <!-- MODAL: NIGHT TURN ORDER MANAGER -->
   <div id="orderManagerModal" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-3">
@@ -597,10 +667,10 @@
       <div class="space-y-1.5 text-xs">
         <button onclick="applyPreset('twelveGathering')" class="w-full text-left p-2.5 rounded-xl bg-obsidian-900 border border-ether-cyan/30 hover:border-ether-cyan space-y-0.5">
           <div class="font-bold text-ether-cyan flex items-center justify-between text-xs font-cinzel">
-            <span>12-Player Gathering (Your Group)</span>
+            <span>12-Player Gathering</span>
             <span class="text-[10px] text-silver-400">🐺 3 | 🧑 9</span>
           </div>
-          <p class="text-[10px] text-silver-400">3 Werewolves, Seer, Bodyguard, Witch, Hunter, Cupid, Oracle, 3 Villagers.</p>
+          <p class="text-[10px] text-silver-400">3 Werewolves, Seer, Bodyguard, Witch, Hunter, Cupid, Oracle, 2 Twins, 1 Villager.</p>
         </button>
 
         <button onclick="applyPreset('classic')" class="w-full text-left p-2.5 rounded-xl bg-obsidian-900 border border-silver-400/20 hover:border-ether-purple space-y-0.5">
@@ -618,25 +688,6 @@
           </div>
           <p class="text-[10px] text-silver-400">3 Werewolves, Seer, Bodyguard, Witch, Hunter, Mayor, Oracle, Tanner.</p>
         </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- MODAL: ROLE ASSIGN -->
-  <div id="roleAssignModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-end sm:items-center justify-center p-3">
-    <div class="glass-card bg-obsidian-950 border border-silver-400/20 rounded-3xl p-4 max-w-xs w-full space-y-2.5 shadow-2xl">
-      <div class="flex justify-between items-center">
-        <div>
-          <h3 class="font-cinzel text-xs font-bold text-silver-100">Assign Role</h3>
-          <p class="text-[10px] text-silver-400" id="assignModalPlayerName">Player</p>
-        </div>
-        <button onclick="closeModal('roleAssignModal')" class="p-1 text-silver-400 hover:text-white">
-          <i data-lucide="x" class="w-4 h-4"></i>
-        </button>
-      </div>
-
-      <div class="grid grid-cols-2 gap-1.5 max-h-56 overflow-y-auto custom-scrollbar" id="assignRoleGrid">
-        <!-- Injected by JS -->
       </div>
     </div>
   </div>
@@ -670,6 +721,10 @@
           <span class="text-slate-300 block">• <strong>Oracle (🧿):</strong> Points to <em>two adjacent neighbors</em> to inquire if at least one is a Werewolf, or asks about fallen spirits!</span>
         </div>
         <div>
+          <strong class="text-teal-300 block font-cinzel">Twins (♊):</strong>
+          Night 1 only: The Twins wake together, make eye contact, and vouch for each other's innocence throughout the match.
+        </div>
+        <div>
           <strong class="text-ether-glow block font-cinzel">Bodyguard / Protector (🛡️):</strong>
           Shields one player from attack. Cannot pick the same target two consecutive nights!
         </div>
@@ -689,18 +744,18 @@
     </div>
   </div>
 
-  <!-- Toast -->
+  <!-- Toast Notification -->
   <div id="toast" class="fixed top-12 left-1/2 -translate-x-1/2 z-50 hidden px-3.5 py-1.5 bg-gradient-to-r from-cyan-600 to-purple-600 text-white text-[11px] font-semibold rounded-full shadow-2xl transition-all border border-white/20">
     Notification
   </div>
 
-  <!-- ================= APPLICATION CODE ENGINE ================= -->
+  <!-- ================= APPLICATION LOGIC ================= -->
   <script>
     /* -------------------------------------------------------------
-     * 1. THREE.JS 3D AMBIENT PARTICLE MOTES (Lantern Embers & Stardust)
+     * 1. THREE.JS 3D AMBIENT PARTICLE MOTES
      * ------------------------------------------------------------- */
     let threeScene, threeCamera, threeRenderer, particleSystem;
-    let particlePositions, particleVelocities, particleCount = 90;
+    let particlePositions, particleVelocities, particleCount = 85;
 
     function initThreeAmbience() {
       const canvas = document.getElementById('three-bg-canvas');
@@ -713,20 +768,19 @@
       threeRenderer.setSize(window.innerWidth, window.innerHeight);
       threeRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-      // Light Particle Motes (Warm lantern embers, fairy lights, celestial mist)
       const particleGeo = new THREE.BufferGeometry();
       particlePositions = new Float32Array(particleCount * 3);
       particleVelocities = [];
       const colors = new Float32Array(particleCount * 3);
 
-      const colorAmber = new THREE.Color(0xf59e0b); // lantern light
-      const colorCyan = new THREE.Color(0x22d3ee);  // moon ether
-      const colorPurple = new THREE.Color(0xa855f7);// mystic twilight
-      const colorSilver = new THREE.Color(0xf8fafc);// starlight
+      const colorAmber = new THREE.Color(0xf59e0b);
+      const colorCyan = new THREE.Color(0x22d3ee);
+      const colorPurple = new THREE.Color(0xa855f7);
+      const colorSilver = new THREE.Color(0xf8fafc);
 
       for (let i = 0; i < particleCount; i++) {
         const i3 = i * 3;
-        particlePositions[i3] = (Math.random() - 0.5) * 12;
+        particlePositions[i3] = (Math.random() - 0.5) * 16;
         particlePositions[i3 + 1] = (Math.random() - 0.5) * 16;
         particlePositions[i3 + 2] = (Math.random() - 0.5) * 6;
 
@@ -736,7 +790,6 @@
           offset: Math.random() * Math.PI * 2
         });
 
-        // Distribute colors: glowing lantern amber, celestial cyan, soft purple
         const rand = Math.random();
         let selectedColor = colorAmber;
         if (rand < 0.4) selectedColor = colorCyan;
@@ -752,7 +805,6 @@
       particleGeo.setAttribute('position', new THREE.BufferAttribute(particlePositions, 3));
       particleGeo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
 
-      // Soft circular point texture generated programmatically
       const pCanvas = document.createElement('canvas');
       pCanvas.width = 32;
       pCanvas.height = 32;
@@ -800,16 +852,12 @@
         for (let i = 0; i < particleCount; i++) {
           const i3 = i * 3;
           const vel = particleVelocities[i];
-
-          // Float upwards
           particlePositions[i3 + 1] += vel.y;
-          // Gentle horizontal drift
           particlePositions[i3] += Math.sin(clockTime + vel.offset) * vel.xSway;
 
-          // Recycle from bottom
           if (particlePositions[i3 + 1] > 8) {
             particlePositions[i3 + 1] = -8;
-            particlePositions[i3] = (Math.random() - 0.5) * 12;
+            particlePositions[i3] = (Math.random() - 0.5) * 16;
           }
         }
         particleSystem.geometry.attributes.position.needsUpdate = true;
@@ -912,7 +960,7 @@
     ];
 
     /* -------------------------------------------------------------
-     * 4. STANDARD ROLES (INCLUDING BODYGUARD & ORACLE)
+     * 4. STANDARD ROLES (INCLUDING TWINS & BODYGUARD)
      * ------------------------------------------------------------- */
     const DEFAULT_STANDARD_ROLES = {
       cupid: {
@@ -923,6 +971,16 @@
         nightOrder: 10,
         targetType: 'double',
         desc: 'Night 1: Selects 2 players to bind in eternal love.',
+        custom: false
+      },
+      twins: {
+        name: 'Twins',
+        team: 'village',
+        icon: '♊',
+        color: 'text-teal-300',
+        nightOrder: 12,
+        targetType: 'none',
+        desc: 'Night 1: The Twins awaken to acknowledge each other as loyal villagers.',
         custom: false
       },
       seer: {
@@ -962,7 +1020,7 @@
         color: 'text-cyan-400',
         nightOrder: 40,
         targetType: 'protect',
-        desc: 'Shields one player each night from attack. Cannot pick the same target two nights consecutively.',
+        desc: 'Shields one player each night. Cannot pick the same target two nights consecutively.',
         custom: false
       },
       witch: {
@@ -1020,7 +1078,7 @@
     const PRESETS = {
       twelveGathering: {
         name: '12-Player Gathering',
-        deck: { werewolf: 3, seer: 1, bodyguard: 1, witch: 1, hunter: 1, cupid: 1, oracle: 1, villager: 3 }
+        deck: { werewolf: 3, seer: 1, bodyguard: 1, witch: 1, hunter: 1, cupid: 1, oracle: 1, twins: 2, villager: 1 }
       },
       classic: {
         name: 'Classic Standard (8)',
@@ -1032,7 +1090,121 @@
       }
     };
 
-    /* Generate an Avatar Badge */
+    /* -------------------------------------------------------------
+     * NANOBANANA DARK FANTASY VECTOR SPRITE GENERATOR
+     * ------------------------------------------------------------- */
+    function renderNanobananaSprite(roleKey) {
+      switch (roleKey) {
+        case 'werewolf':
+          return `
+            <svg viewBox="0 0 100 100" class="w-14 h-14 mx-auto text-rose-500 filter drop-shadow">
+              <circle cx="50" cy="50" r="44" fill="#18040a" stroke="#e11d48" stroke-width="2"/>
+              <path d="M25 35 L40 15 L45 35 L55 35 L60 15 L75 35 L80 60 L68 85 L32 85 L20 60 Z" fill="#2d0a14" stroke="#f43f5e" stroke-width="2"/>
+              <circle cx="38" cy="50" r="4" fill="#ef4444"/>
+              <circle cx="62" cy="50" r="4" fill="#ef4444"/>
+              <path d="M42 68 L50 78 L58 68 Z" fill="#ffffff"/>
+              <path d="M35 72 L42 68 L50 73 L58 68 L65 72" stroke="#e11d48" stroke-width="2" fill="none"/>
+            </svg>
+          `;
+        case 'seer':
+          return `
+            <svg viewBox="0 0 100 100" class="w-14 h-14 mx-auto text-purple-400 filter drop-shadow">
+              <circle cx="50" cy="50" r="44" fill="#130720" stroke="#a855f7" stroke-width="2"/>
+              <path d="M15 50 Q50 18 85 50 Q50 82 15 50 Z" fill="#280c44" stroke="#c084fc" stroke-width="2"/>
+              <circle cx="50" cy="50" r="14" fill="#06b6d4" stroke="#ffffff" stroke-width="1.5"/>
+              <circle cx="50" cy="50" r="6" fill="#0b0d14"/>
+              <line x1="50" y1="12" x2="50" y2="24" stroke="#c084fc" stroke-width="2"/>
+              <line x1="50" y1="76" x2="50" y2="88" stroke="#c084fc" stroke-width="2"/>
+            </svg>
+          `;
+        case 'bodyguard':
+          return `
+            <svg viewBox="0 0 100 100" class="w-14 h-14 mx-auto text-cyan-400 filter drop-shadow">
+              <circle cx="50" cy="50" r="44" fill="#05141c" stroke="#06b6d4" stroke-width="2"/>
+              <path d="M50 20 L76 28 L72 62 Q50 84 50 84 Q50 84 28 62 L24 28 Z" fill="#082b3a" stroke="#22d3ee" stroke-width="2.5"/>
+              <path d="M50 30 L50 72" stroke="#22d3ee" stroke-width="2.5"/>
+              <path d="M34 44 L66 44" stroke="#22d3ee" stroke-width="2.5"/>
+            </svg>
+          `;
+        case 'witch':
+          return `
+            <svg viewBox="0 0 100 100" class="w-14 h-14 mx-auto text-emerald-400 filter drop-shadow">
+              <circle cx="50" cy="50" r="44" fill="#041710" stroke="#10b981" stroke-width="2"/>
+              <path d="M24 55 Q20 85 50 85 Q80 85 76 55 Z" fill="#073022" stroke="#34d399" stroke-width="2.5"/>
+              <ellipse cx="50" cy="55" rx="26" ry="6" fill="#10b981" stroke="#34d399" stroke-width="2"/>
+              <circle cx="42" cy="40" r="4" fill="#34d399" opacity="0.8"/>
+              <circle cx="56" cy="34" r="5" fill="#34d399" opacity="0.9"/>
+              <circle cx="50" cy="24" r="3" fill="#a7f3d0"/>
+            </svg>
+          `;
+        case 'hunter':
+          return `
+            <svg viewBox="0 0 100 100" class="w-14 h-14 mx-auto text-amber-400 filter drop-shadow">
+              <circle cx="50" cy="50" r="44" fill="#181104" stroke="#f59e0b" stroke-width="2"/>
+              <circle cx="50" cy="50" r="28" fill="none" stroke="#fbbf24" stroke-width="2" stroke-dasharray="6 3"/>
+              <line x1="50" y1="16" x2="50" y2="84" stroke="#f59e0b" stroke-width="2.5"/>
+              <line x1="16" y1="50" x2="84" y2="50" stroke="#f59e0b" stroke-width="2.5"/>
+              <polygon points="50,14 44,24 56,24" fill="#f59e0b"/>
+            </svg>
+          `;
+        case 'cupid':
+          return `
+            <svg viewBox="0 0 100 100" class="w-14 h-14 mx-auto text-pink-400 filter drop-shadow">
+              <circle cx="50" cy="50" r="44" fill="#1c0712" stroke="#ec4899" stroke-width="2"/>
+              <path d="M50 76 L26 48 Q16 34 32 24 Q44 18 50 32 Q56 18 68 24 Q84 34 74 48 Z" fill="#831843" stroke="#f472b6" stroke-width="2"/>
+              <line x1="20" y1="80" x2="80" y2="20" stroke="#fbcfe8" stroke-width="2.5"/>
+              <polygon points="80,20 70,22 78,30" fill="#fbcfe8"/>
+            </svg>
+          `;
+        case 'twins':
+          return `
+            <svg viewBox="0 0 100 100" class="w-14 h-14 mx-auto text-teal-300 filter drop-shadow">
+              <circle cx="50" cy="50" r="44" fill="#041619" stroke="#14b8a6" stroke-width="2"/>
+              <circle cx="36" cy="42" r="12" fill="#0d4a46" stroke="#2dd4bf" stroke-width="1.8"/>
+              <path d="M18 76 Q18 58 36 58 Q46 58 48 64 L48 76 Z" fill="#0d4a46" stroke="#2dd4bf" stroke-width="1.8"/>
+              <circle cx="64" cy="42" r="12" fill="#0f5c57" stroke="#5eead4" stroke-width="1.8"/>
+              <path d="M52 76 L52 64 Q54 58 64 58 Q82 58 82 76 Z" fill="#0f5c57" stroke="#5eead4" stroke-width="1.8"/>
+              <path d="M38 48 Q50 36 62 48 Q50 60 38 48 Z" fill="none" stroke="#2dd4bf" stroke-width="2"/>
+            </svg>
+          `;
+        case 'oracle':
+          return `
+            <svg viewBox="0 0 100 100" class="w-14 h-14 mx-auto text-indigo-400 filter drop-shadow">
+              <circle cx="50" cy="50" r="44" fill="#0b0820" stroke="#6366f1" stroke-width="2"/>
+              <polygon points="50,16 62,38 86,38 68,54 74,78 50,64 26,78 32,54 14,38 38,38" fill="#1e1b4b" stroke="#818cf8" stroke-width="2"/>
+              <circle cx="50" cy="48" r="9" fill="#22d3ee"/>
+            </svg>
+          `;
+        case 'mayor':
+          return `
+            <svg viewBox="0 0 100 100" class="w-14 h-14 mx-auto text-yellow-400 filter drop-shadow">
+              <circle cx="50" cy="50" r="44" fill="#1c1604" stroke="#eab308" stroke-width="2"/>
+              <circle cx="50" cy="42" r="18" fill="#713f12" stroke="#fde047" stroke-width="2.5"/>
+              <polygon points="50,30 54,38 64,38 56,44 59,54 50,48 41,54 44,44 36,38 46,38" fill="#fef08a"/>
+              <path d="M36 58 L28 84 L50 76 L72 84 L64 58 Z" fill="#854d0e" stroke="#fde047" stroke-width="1.8"/>
+            </svg>
+          `;
+        case 'tanner':
+          return `
+            <svg viewBox="0 0 100 100" class="w-14 h-14 mx-auto text-orange-400 filter drop-shadow">
+              <circle cx="50" cy="50" r="44" fill="#1c0b04" stroke="#f97316" stroke-width="2"/>
+              <path d="M26 30 Q50 16 74 30 L68 70 Q50 86 32 70 Z" fill="#431407" stroke="#fb923c" stroke-width="2"/>
+              <circle cx="40" cy="45" r="4" fill="#fdba74"/>
+              <circle cx="60" cy="45" r="4" fill="#fdba74"/>
+              <path d="M36 64 Q50 54 64 64" stroke="#fdba74" stroke-width="2.5" fill="none"/>
+            </svg>
+          `;
+        default:
+          return `
+            <svg viewBox="0 0 100 100" class="w-14 h-14 mx-auto text-silver-300 filter drop-shadow">
+              <circle cx="50" cy="50" r="44" fill="#0b121e" stroke="#94a3b8" stroke-width="2"/>
+              <circle cx="50" cy="38" r="14" fill="#1e293b" stroke="#cbd5e1" stroke-width="2"/>
+              <path d="M22 78 Q22 58 50 58 Q78 58 78 78 Z" fill="#1e293b" stroke="#cbd5e1" stroke-width="2"/>
+            </svg>
+          `;
+      }
+    }
+
     function generateAvatarSvg(name, roleKey) {
       const colors = ['#06b6d4', '#8b5cf6', '#a855f7', '#3b82f6', '#14b8a6', '#6366f1'];
       let hash = 0;
@@ -1049,7 +1221,7 @@
     }
 
     /* -------------------------------------------------------------
-     * 5. SESSION DATA MODEL
+     * 5. SESSION DATA ARCHITECTURE
      * ------------------------------------------------------------- */
     const AppData = {
       sessions: [],
@@ -1066,11 +1238,12 @@
         title: title || 'Paskong Pinoy Vigil',
         createdAt: new Date().toLocaleDateString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
         phase: 'SETUP',
+        setupSubTab: 'deck', // 'deck' | 'players'
         dayNumber: 1,
         players: [],
         roles: JSON.parse(JSON.stringify(DEFAULT_STANDARD_ROLES)),
         deckConfig: { ...PRESETS.twelveGathering.deck },
-        nightStepOrder: ['cupid', 'seer', 'oracle', 'werewolf', 'bodyguard', 'witch'],
+        nightStepOrder: ['cupid', 'twins', 'seer', 'oracle', 'werewolf', 'bodyguard', 'witch'],
         currentStepIndex: 0,
         witchPotions: { healAvailable: true, poisonAvailable: true },
         nightTargets: {
@@ -1096,12 +1269,25 @@
     }
 
     /* -------------------------------------------------------------
-     * 6. SCREEN TRANSITIONS
+     * 6. SCREEN TRANSITIONS & BACKGROUND SCALING
      * ------------------------------------------------------------- */
+    function updateArtBackgroundState(screen) {
+      const bg = document.getElementById('artBackgroundContainer');
+      if (!bg) return;
+      if (screen === 'title') {
+        bg.style.opacity = '1';
+      } else if (screen === 'menu') {
+        bg.style.opacity = '0.9';
+      } else if (screen === 'game') {
+        bg.style.opacity = '0.18';
+      }
+    }
+
     function showTitleScreen() {
       document.getElementById('screenTitle').classList.remove('hidden');
       document.getElementById('screenMenu').classList.add('hidden');
       document.getElementById('activeGameWrapper').classList.add('hidden');
+      updateArtBackgroundState('title');
     }
 
     function enterMainMenu() {
@@ -1109,6 +1295,7 @@
       document.getElementById('screenTitle').classList.add('hidden');
       document.getElementById('screenMenu').classList.remove('hidden');
       document.getElementById('activeGameWrapper').classList.add('hidden');
+      updateArtBackgroundState('menu');
       renderSessionsList();
       refreshIcons();
     }
@@ -1116,6 +1303,7 @@
     function returnToMainMenu() {
       document.getElementById('activeGameWrapper').classList.add('hidden');
       document.getElementById('screenMenu').classList.remove('hidden');
+      updateArtBackgroundState('menu');
       renderSessionsList();
       refreshIcons();
     }
@@ -1127,11 +1315,11 @@
 
       document.getElementById('screenMenu').classList.add('hidden');
       document.getElementById('activeGameWrapper').classList.remove('hidden');
-
       document.getElementById('hudSessionTitle').innerText = s.title;
+      updateArtBackgroundState('game');
 
-      renderPlayerChips();
-      renderRolesSelectorGrid();
+      renderDeckCardView();
+      renderPlayerTable();
       updateDeckMatchStatus();
       updateHeaderStats();
 
@@ -1208,8 +1396,254 @@
     }
 
     /* -------------------------------------------------------------
-     * 8. PLAYERS SETUP & 12-PLAYER PRESET INJECTION
+     * 8. SETUP SUB-TABS (DECK SETUP VS PLAYER SETUP)
      * ------------------------------------------------------------- */
+    function switchSetupSubTab(tab) {
+      const s = getActiveSession();
+      if (s) s.setupSubTab = tab;
+
+      const btnDeck = document.getElementById('btnSubTabDeck');
+      const btnPlayers = document.getElementById('btnSubTabPlayers');
+      const viewDeck = document.getElementById('setupTabContentDeck');
+      const viewPlayers = document.getElementById('setupTabContentPlayers');
+
+      if (tab === 'deck') {
+        btnDeck.className = 'py-2 rounded-xl flex items-center justify-center gap-1.5 transition-all bg-gradient-to-r from-cyan-600 to-purple-600 text-white shadow';
+        btnPlayers.className = 'py-2 rounded-xl flex items-center justify-center gap-1.5 transition-all text-silver-400 hover:text-white';
+        viewDeck.classList.remove('hidden');
+        viewPlayers.classList.add('hidden');
+        renderDeckCardView();
+      } else {
+        btnPlayers.className = 'py-2 rounded-xl flex items-center justify-center gap-1.5 transition-all bg-gradient-to-r from-cyan-600 to-purple-600 text-white shadow';
+        btnDeck.className = 'py-2 rounded-xl flex items-center justify-center gap-1.5 transition-all text-silver-400 hover:text-white';
+        viewPlayers.classList.remove('hidden');
+        viewDeck.classList.add('hidden');
+        renderPlayerTable();
+      }
+      refreshIcons();
+    }
+
+    /* -------------------------------------------------------------
+     * 9. DECK CARD VIEW WITH NANOBANANA SPRITES
+     * ------------------------------------------------------------- */
+    function renderDeckCardView() {
+      const s = getActiveSession();
+      if (!s) return;
+
+      const container = document.getElementById('deckCardViewGrid');
+      let totalCards = 0;
+
+      container.innerHTML = Object.entries(s.roles).map(([key, def]) => {
+        const count = s.deckConfig[key] || 0;
+        totalCards += count;
+        const sprite = renderNanobananaSprite(key);
+        const isSelected = count > 0;
+        const teamBadgeColor = def.team === 'werewolf' ? 'text-rose-400 border-rose-500/30' : (def.team === 'village' ? 'text-cyan-400 border-cyan-500/30' : 'text-orange-400 border-orange-500/30');
+
+        return `
+          <div class="glass-card rounded-2xl p-3 flex flex-col justify-between transition-all ${isSelected ? 'border-ether-cyan/40 shadow-lg shadow-cyan-950/40 bg-obsidian-900/80' : 'border-silver-400/10 opacity-75'}">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <div class="flex items-center gap-1.5 truncate">
+                  <span class="text-sm">${def.icon}</span>
+                  <span class="font-cinzel text-xs font-bold text-white truncate">${def.name}</span>
+                </div>
+                <span class="text-[8px] uppercase font-bold px-1.5 py-0.2 rounded bg-obsidian-950 border ${teamBadgeColor}">
+                  ${def.team}
+                </span>
+              </div>
+
+              <!-- Center Nanobanana Art Sprite -->
+              <div class="py-2.5 bg-obsidian-950/70 rounded-xl border border-white/5 my-1.5 flex items-center justify-center relative overflow-hidden">
+                ${sprite}
+                <div class="absolute bottom-1 right-2 text-[9px] font-mono text-silver-500 uppercase tracking-widest font-bold">
+                  CARD
+                </div>
+              </div>
+
+              <p class="text-[10px] text-silver-400 font-medieval line-clamp-2 mt-1 min-h-[30px]">
+                ${def.desc}
+              </p>
+            </div>
+
+            <!-- Card Quantity Controls -->
+            <div class="flex items-center justify-between pt-2 mt-2 border-t border-silver-400/10">
+              <span class="text-[10px] font-cinzel text-silver-400">Copies in Deck</span>
+              <div class="flex items-center gap-1.5">
+                <button onclick="adjustRoleCount('${key}', -1)" class="w-6 h-6 rounded-lg bg-obsidian-800 hover:bg-obsidian-700 active:scale-90 flex items-center justify-center text-silver-200 border border-silver-400/20">
+                  <i data-lucide="minus" class="w-3 h-3"></i>
+                </button>
+                <span class="w-5 text-center font-bold text-xs text-white">${count}</span>
+                <button onclick="adjustRoleCount('${key}', 1)" class="w-6 h-6 rounded-lg bg-obsidian-800 hover:bg-obsidian-700 active:scale-90 flex items-center justify-center text-silver-200 border border-silver-400/20">
+                  <i data-lucide="plus" class="w-3 h-3"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      document.getElementById('setupDeckCardTotal').innerText = totalCards;
+      document.getElementById('deckCardStatusText').innerText = `${totalCards} Active Cards`;
+      updateDeckMatchStatus();
+      refreshIcons();
+    }
+
+    function adjustRoleCount(key, delta) {
+      const s = getActiveSession();
+      if (!s) return;
+      const current = s.deckConfig[key] || 0;
+      s.deckConfig[key] = Math.max(0, current + delta);
+      renderDeckCardView();
+      renderPlayerTable();
+    }
+
+    function updateDeckMatchStatus() {
+      const s = getActiveSession();
+      if (!s) return;
+      const totalRoles = Object.values(s.deckConfig).reduce((a, b) => a + b, 0);
+      const totalPlayers = s.players.length;
+      const badge = document.getElementById('roleCountMatch');
+      badge.innerText = `${totalRoles} Cards / ${totalPlayers} Players`;
+
+      if (totalRoles === totalPlayers && totalPlayers > 0) {
+        badge.className = 'text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-cyan-950/60 text-cyan-400 border border-cyan-500/40';
+      } else {
+        badge.className = 'text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-purple-950/60 text-purple-300 border border-purple-500/40';
+      }
+    }
+
+    function applyPreset(presetKey) {
+      const s = getActiveSession();
+      if (!s) return;
+      const preset = PRESETS[presetKey];
+      if (!preset) return;
+
+      s.deckConfig = { ...preset.deck };
+      document.getElementById('currentPresetName').innerText = preset.name;
+      renderDeckCardView();
+      renderPlayerTable();
+      closeModal('presetSelectModal');
+      showToast(`Loaded ${preset.name}`);
+    }
+
+    /* -------------------------------------------------------------
+     * 10. PLAYER SETUP: QUICK TABLE FORMAT WITH CRUD & DROPDOWNS
+     * ------------------------------------------------------------- */
+    function getRemainingRoleCounts(s) {
+      const assigned = {};
+      s.players.forEach(p => {
+        if (p.roleKey) {
+          assigned[p.roleKey] = (assigned[p.roleKey] || 0) + 1;
+        }
+      });
+
+      const remaining = {};
+      Object.keys(s.roles).forEach(key => {
+        const total = s.deckConfig[key] || 0;
+        const used = assigned[key] || 0;
+        remaining[key] = Math.max(0, total - used);
+      });
+      return remaining;
+    }
+
+    function renderPlayerTable() {
+      const s = getActiveSession();
+      if (!s) return;
+
+      const tbody = document.getElementById('playerTableBody');
+      const playerCount = s.players.length;
+      document.getElementById('setupPlayerTotal').innerText = playerCount;
+
+      const remaining = getRemainingRoleCounts(s);
+      const totalUnassignedDeck = Object.values(remaining).reduce((a, b) => a + b, 0);
+      document.getElementById('remainingDeckBadge').innerText = totalUnassignedDeck;
+
+      if (playerCount === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="4" class="py-6 text-center text-silver-500 italic text-xs">
+              No villagers enrolled yet. Tap "+12 Presets" or type a name above!
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = s.players.map((p, idx) => {
+        const avatarSvg = generateAvatarSvg(p.name, p.roleKey);
+
+        let roleOptionsHtml = `<option value="" class="bg-obsidian-950 text-slate-400">-- Select Role --</option>`;
+
+        Object.keys(s.deckConfig).forEach(roleKey => {
+          const def = s.roles[roleKey];
+          if (!def) return;
+          const isCurrentlyAssigned = (p.roleKey === roleKey);
+          const left = remaining[roleKey] || 0;
+
+          if (isCurrentlyAssigned) {
+            roleOptionsHtml += `
+              <option value="${roleKey}" selected class="bg-obsidian-950 text-ether-glow font-bold">
+                ✓ ${def.icon} ${def.name}
+              </option>
+            `;
+          } else if (left > 0) {
+            roleOptionsHtml += `
+              <option value="${roleKey}" class="bg-obsidian-950 text-silver-200">
+                ${def.icon} ${def.name} (${left} left)
+              </option>
+            `;
+          }
+        });
+
+        return `
+          <tr class="hover:bg-white/[0.02] transition-colors">
+            <td class="py-2.5 px-3 whitespace-nowrap">
+              <div class="flex items-center gap-1.5">
+                <span class="text-[10px] font-mono text-silver-500 w-3 text-right">${idx + 1}.</span>
+                ${avatarSvg}
+              </div>
+            </td>
+            <td class="py-2.5 px-2 font-medium text-white truncate max-w-[90px]">
+              <span class="cursor-pointer hover:text-ether-cyan transition-colors" onclick="openPlayerNameEditModal('${p.id}', '${p.name.replace(/'/g, "\\'")}')" title="Click to rename">
+                ${p.name}
+              </span>
+            </td>
+            <td class="py-2.5 px-2">
+              <select onchange="assignPlayerRoleDropdown('${p.id}', this.value)" 
+                class="w-full bg-obsidian-950 border ${p.roleKey ? 'border-ether-cyan/40 text-ether-glow' : 'border-silver-400/20 text-silver-400'} rounded-lg py-1 px-1.5 text-[11px] focus:outline-none focus:border-ether-cyan">
+                ${roleOptionsHtml}
+              </select>
+            </td>
+            <td class="py-2.5 px-2 text-right whitespace-nowrap">
+              <div class="inline-flex items-center gap-1">
+                <button onclick="openPlayerNameEditModal('${p.id}', '${p.name.replace(/'/g, "\\'")}')" title="Rename" class="p-1 rounded-lg bg-obsidian-800 text-silver-400 hover:text-white">
+                  <i data-lucide="edit-2" class="w-3 h-3"></i>
+                </button>
+                <button onclick="removePlayer('${p.id}')" title="Delete" class="p-1 rounded-lg bg-obsidian-800 text-silver-500 hover:text-rose-400">
+                  <i data-lucide="trash-2" class="w-3 h-3"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      updateDeckMatchStatus();
+      refreshIcons();
+    }
+
+    function assignPlayerRoleDropdown(playerId, roleKey) {
+      const s = getActiveSession();
+      if (!s) return;
+      const p = s.players.find(x => x.id === playerId);
+      if (p) {
+        p.roleKey = roleKey || null;
+        renderPlayerTable();
+        showToast(`${p.name} assigned: ${p.roleKey ? s.roles[p.roleKey].name : 'Unassigned'}`);
+      }
+    }
+
     function addPlayer(name) {
       const s = getActiveSession();
       if (!s) return;
@@ -1228,8 +1662,7 @@
       });
 
       if (!name) input.value = '';
-      renderPlayerChips();
-      updateDeckMatchStatus();
+      renderPlayerTable();
       refreshIcons();
     }
 
@@ -1237,9 +1670,30 @@
       const s = getActiveSession();
       if (!s) return;
       s.players = s.players.filter(p => p.id !== id);
-      renderPlayerChips();
-      updateDeckMatchStatus();
+      renderPlayerTable();
       refreshIcons();
+    }
+
+    function openPlayerNameEditModal(id, currentName) {
+      document.getElementById('editPlayerTargetId').value = id;
+      document.getElementById('editPlayerNameInput').value = currentName;
+      openModal('editPlayerNameModal');
+    }
+
+    function savePlayerNameEdit() {
+      const s = getActiveSession();
+      if (!s) return;
+      const id = document.getElementById('editPlayerTargetId').value;
+      const newName = document.getElementById('editPlayerNameInput').value.trim();
+      if (!newName) return;
+
+      const p = s.players.find(x => x.id === id);
+      if (p) {
+        p.name = newName;
+        renderPlayerTable();
+        showToast(`Renamed to ${newName}`);
+      }
+      closeModal('editPlayerNameModal');
     }
 
     function quickAddYourTwelvePlayers() {
@@ -1250,169 +1704,37 @@
       showToast('12 Preset Players Loaded');
     }
 
-    function renderPlayerChips() {
-      const s = getActiveSession();
-      if (!s) return;
-      const container = document.getElementById('playerChipsContainer');
-      document.getElementById('playerCount').innerText = s.players.length;
-
-      if (s.players.length === 0) {
-        container.innerHTML = '<span class="text-[11px] text-silver-500 italic">No players enrolled yet.</span>';
-        return;
-      }
-
-      container.innerHTML = s.players.map((p, idx) => {
-        const roleDef = p.roleKey ? s.roles[p.roleKey] : null;
-        const icon = roleDef ? roleDef.icon : '❓';
-        const avatarSvg = generateAvatarSvg(p.name, p.roleKey);
-
-        return `
-          <div class="flex items-center gap-1.5 bg-obsidian-950/80 border border-silver-400/15 px-2 py-1 rounded-xl text-xs shadow-inner">
-            ${avatarSvg}
-            <button onclick="openRoleAssignModal('${p.id}')" class="flex items-center gap-1 hover:text-ether-cyan font-medium text-left">
-              <span class="truncate max-w-[65px] text-[11px] text-white">${p.name}</span>
-              <span class="text-[10px]">${icon}</span>
-            </button>
-            <button onclick="removePlayer('${p.id}')" class="text-silver-500 hover:text-ether-glow p-0.5 ml-0.5">
-              <i data-lucide="x" class="w-3 h-3"></i>
-            </button>
-          </div>
-        `;
-      }).join('');
-      refreshIcons();
-    }
-
-    /* -------------------------------------------------------------
-     * 9. DECK & ROLE ASSIGNMENT
-     * ------------------------------------------------------------- */
-    function renderRolesSelectorGrid() {
-      const s = getActiveSession();
-      if (!s) return;
-      const grid = document.getElementById('rolesSelectorGrid');
-      grid.innerHTML = Object.entries(s.roles).map(([key, def]) => {
-        const count = s.deckConfig[key] || 0;
-        return `
-          <div class="bg-obsidian-950/80 border border-silver-400/10 p-1.5 rounded-xl flex items-center justify-between">
-            <div class="flex items-center gap-1.5 truncate mr-1">
-              <span class="text-sm">${def.icon}</span>
-              <span class="truncate font-medium text-silver-200 text-[11px] font-cinzel">${def.name}</span>
-            </div>
-            <div class="flex items-center gap-1 flex-shrink-0">
-              <button onclick="adjustRoleCount('${key}', -1)" class="w-5 h-5 rounded bg-obsidian-800 active:scale-90 flex items-center justify-center text-silver-300">
-                <i data-lucide="minus" class="w-3 h-3"></i>
-              </button>
-              <span class="w-3.5 text-center font-bold text-silver-100 text-[11px]">${count}</span>
-              <button onclick="adjustRoleCount('${key}', 1)" class="w-5 h-5 rounded bg-obsidian-800 active:scale-90 flex items-center justify-center text-silver-300">
-                <i data-lucide="plus" class="w-3 h-3"></i>
-              </button>
-            </div>
-          </div>
-        `;
-      }).join('');
-      refreshIcons();
-    }
-
-    function adjustRoleCount(key, delta) {
-      const s = getActiveSession();
-      if (!s) return;
-      const current = s.deckConfig[key] || 0;
-      s.deckConfig[key] = Math.max(0, current + delta);
-      renderRolesSelectorGrid();
-      updateDeckMatchStatus();
-    }
-
-    function updateDeckMatchStatus() {
-      const s = getActiveSession();
-      if (!s) return;
-      const totalRoles = Object.values(s.deckConfig).reduce((a, b) => a + b, 0);
-      const totalPlayers = s.players.length;
-      const badge = document.getElementById('roleCountMatch');
-      badge.innerText = `${totalRoles}/${totalPlayers}`;
-
-      if (totalRoles === totalPlayers && totalPlayers > 0) {
-        badge.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-cyan-950/60 text-cyan-400 border border-cyan-500/30';
-      } else {
-        badge.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-950/60 text-purple-300 border border-purple-500/30';
-      }
-    }
-
-    function applyPreset(presetKey) {
-      const s = getActiveSession();
-      if (!s) return;
-      const preset = PRESETS[presetKey];
-      if (!preset) return;
-
-      s.deckConfig = { ...preset.deck };
-      document.getElementById('currentPresetName').innerText = preset.name;
-      renderRolesSelectorGrid();
-      updateDeckMatchStatus();
-      closeModal('presetSelectModal');
-      showToast(`Loaded ${preset.name}`);
-    }
-
-    /* Assign Player Role Modal */
-    let playerAssigningId = null;
-    function openRoleAssignModal(playerId) {
-      const s = getActiveSession();
-      if (!s) return;
-      playerAssigningId = playerId;
-      const p = s.players.find(x => x.id === playerId);
-      document.getElementById('assignModalPlayerName').innerText = p.name;
-
-      const grid = document.getElementById('assignRoleGrid');
-      grid.innerHTML = Object.entries(s.roles).map(([key, def]) => {
-        const isSelected = p.roleKey === key;
-        return `
-          <button onclick="setPlayerRole('${key}')" class="p-2 rounded-xl border text-left flex items-center gap-1.5 ${isSelected ? 'bg-cyan-950/60 border-cyan-500 text-cyan-200' : 'bg-obsidian-900 border-silver-400/10 hover:border-silver-400/30 text-silver-300'}">
-            <span class="text-sm">${def.icon}</span>
-            <span class="text-[11px] font-medium font-cinzel truncate">${def.name}</span>
-          </button>
-        `;
-      }).join('');
-
-      openModal('roleAssignModal');
-      refreshIcons();
-    }
-
-    function setPlayerRole(roleKey) {
-      const s = getActiveSession();
-      if (!s) return;
-      const p = s.players.find(x => x.id === playerAssigningId);
-      if (p) {
-        p.roleKey = roleKey;
-        renderPlayerChips();
-      }
-      closeModal('roleAssignModal');
-    }
-
     function autoDistributeDeck() {
       const s = getActiveSession();
       if (!s) return;
       const unassigned = s.players.filter(p => !p.roleKey);
-      if (unassigned.length === 0) return;
+      if (unassigned.length === 0) {
+        showToast('All players already have roles assigned!');
+        return;
+      }
 
+      const remaining = getRemainingRoleCounts(s);
       let pool = [];
-      const assignedCounts = {};
-      s.players.forEach(p => {
-        if (p.roleKey) assignedCounts[p.roleKey] = (assignedCounts[p.roleKey] || 0) + 1;
+      Object.entries(remaining).forEach(([roleKey, count]) => {
+        for (let i = 0; i < count; i++) pool.push(roleKey);
       });
 
-      Object.entries(s.deckConfig).forEach(([role, count]) => {
-        const already = assignedCounts[role] || 0;
-        const needed = Math.max(0, count - already);
-        for (let i = 0; i < needed; i++) pool.push(role);
-      });
-
-      while (pool.length < unassigned.length) pool.push('villager');
       pool = pool.sort(() => Math.random() - 0.5);
 
+      let assignedCount = 0;
       unassigned.forEach((p, idx) => {
-        p.roleKey = pool[idx];
+        if (pool[idx]) {
+          p.roleKey = pool[idx];
+          assignedCount++;
+        }
       });
+
+      renderPlayerTable();
+      showToast(`Auto-assigned ${assignedCount} roles`);
     }
 
     /* -------------------------------------------------------------
-     * 10. NIGHT SEQUENCE RE-ORDERING
+     * 11. NIGHT SEQUENCE ORDERING
      * ------------------------------------------------------------- */
     function openOrderManagerModal() {
       renderOrderManagerList();
@@ -1478,7 +1800,7 @@
     }
 
     /* -------------------------------------------------------------
-     * 11. ROLE MANAGER MODAL
+     * 12. ROLE MANAGER MODAL
      * ------------------------------------------------------------- */
     function openRoleManagerModal() {
       renderRoleManagerList();
@@ -1588,8 +1910,8 @@
 
       closeModal('roleFormModal');
       renderRoleManagerList();
-      renderRolesSelectorGrid();
-      updateDeckMatchStatus();
+      renderDeckCardView();
+      renderPlayerTable();
       showToast(`Saved ${name}`);
       refreshIcons();
     }
@@ -1602,15 +1924,15 @@
         delete s.deckConfig[key];
         s.nightStepOrder = s.nightStepOrder.filter(k => k !== key);
         renderRoleManagerList();
-        renderRolesSelectorGrid();
-        updateDeckMatchStatus();
+        renderDeckCardView();
+        renderPlayerTable();
         showToast('Role deleted');
         refreshIcons();
       }
     }
 
     /* -------------------------------------------------------------
-     * 12. GAME FLOW & TARGETING
+     * 13. GAME COMMENCEMENT & TARGETING
      * ------------------------------------------------------------- */
     function startGame() {
       const s = getActiveSession();
@@ -1619,8 +1941,9 @@
         showToast('Min 4 players required');
         return;
       }
+
       autoDistributeDeck();
-      renderPlayerChips();
+      renderPlayerTable();
 
       logEvent('🌑 Night 1 begins under the obsidian moon.');
       startNightPhase(1);
@@ -1635,6 +1958,7 @@
         if (!s.roles[roleKey]) return false;
         if (!hasLivingRole(roleKey)) return false;
         if (roleKey === 'cupid' && s.dayNumber > 1) return false;
+        if (roleKey === 'twins' && s.dayNumber > 1) return false;
         if (roleKey === 'witch' && !s.witchPotions.healAvailable && !s.witchPotions.poisonAvailable) return false;
         return true;
       });
@@ -1683,6 +2007,7 @@
 
       let html = '';
       if (roleKey === 'cupid') html = renderCupidStep();
+      else if (roleKey === 'twins') html = renderTwinsStep();
       else if (roleKey === 'seer') html = renderSeerStep();
       else if (roleKey === 'oracle') html = renderOracleStep();
       else if (roleKey === 'werewolf') html = renderWerewolfStep();
@@ -1749,7 +2074,34 @@
       renderNightStep();
     }
 
-    /* Step: Seer (Direct Alignment Check) */
+    /* Step: Twins */
+    function renderTwinsStep() {
+      const s = getActiveSession();
+      const livingTwins = s.players.filter(p => p.alive && p.roleKey === 'twins').map(p => p.name);
+      return `
+        <div>
+          <div class="flex items-center gap-1.5 mb-1.5">
+            <span class="text-xl">♊</span>
+            <div>
+              <h3 class="font-cinzel text-xs font-bold text-teal-300">The Twins' Recognition</h3>
+              <p class="text-[10px] text-silver-400">Night 1 Only (Living Twins: ${livingTwins.join(' & ') || 'None'})</p>
+            </div>
+          </div>
+          <div class="bg-obsidian-950/80 p-2.5 rounded-xl border border-teal-500/20 text-[11px] text-silver-200 mb-3 font-medieval leading-relaxed">
+            "Twins, awaken. Open your eyes, look at one another, and silently acknowledge your twin..."
+          </div>
+          <div class="p-3 rounded-2xl bg-teal-950/30 border border-teal-500/30 text-center space-y-1">
+            <span class="text-xs font-bold text-teal-300 font-cinzel">Twin Souls Confirmed</span>
+            <p class="text-[10px] text-silver-400">Both are confirmed innocent villagers to each other.</p>
+          </div>
+        </div>
+        <div class="text-[10px] text-silver-400">
+          After eye contact, announce: "Twins, close your eyes."
+        </div>
+      `;
+    }
+
+    /* Step: Seer */
     function renderSeerStep() {
       const s = getActiveSession();
       const targets = s.players.filter(p => p.alive && p.roleKey !== 'seer');
@@ -2107,7 +2459,7 @@
     }
 
     /* -------------------------------------------------------------
-     * 13. DAWN RESOLUTION & CASUALTY REPORT
+     * 14. DAWN RESOLUTION & CASUALTY REPORT
      * ------------------------------------------------------------- */
     function finalizeNightAndShowDawn() {
       const s = getActiveSession();
@@ -2115,7 +2467,6 @@
       const nt = s.nightTargets;
       const casualties = new Set();
 
-      // Werewolf attack check against Bodyguard shield & Witch heal
       if (nt.werewolfVictimId) {
         const protectedByBodyguard = (nt.protectedId === nt.werewolfVictimId);
         const healedByWitch = nt.witchHealedVictim;
@@ -2124,19 +2475,16 @@
         }
       }
 
-      // Witch actions
       if (nt.witchHealedVictim) s.witchPotions.healAvailable = false;
       if (nt.witchPoisonTargetId) {
         casualties.add(nt.witchPoisonTargetId);
         s.witchPotions.poisonAvailable = false;
       }
 
-      // Save protection memory for bodyguard consecutive night check
       s.players.forEach(p => {
         p.lastProtected = (p.id === nt.protectedId);
       });
 
-      // Lover collateral deaths
       const initialCasualties = Array.from(casualties);
       initialCasualties.forEach(deadId => {
         const victim = s.players.find(p => p.id === deadId);
@@ -2221,7 +2569,7 @@
     }
 
     /* -------------------------------------------------------------
-     * 14. DAY & VOTING
+     * 15. DAY & VOTING
      * ------------------------------------------------------------- */
     function startDayPhase() {
       const s = getActiveSession();
@@ -2311,7 +2659,7 @@
     }
 
     /* -------------------------------------------------------------
-     * 15. DISCUSSION TIMER
+     * 16. DISCUSSION TIMER
      * ------------------------------------------------------------- */
     let timerInterval = null;
     function toggleTimer() {
@@ -2387,7 +2735,7 @@
     }
 
     /* -------------------------------------------------------------
-     * 16. WIN CONDITIONS & HUD
+     * 17. WIN CONDITIONS & HUD
      * ------------------------------------------------------------- */
     function checkWinConditions() {
       const s = getActiveSession();
@@ -2396,20 +2744,17 @@
       const livingWolves = living.filter(p => s.roles[p.roleKey]?.team === 'werewolf');
       const livingGood = living.filter(p => s.roles[p.roleKey]?.team === 'village');
 
-      // Lovers solo win
       const livingLovers = living.filter(p => p.isLover);
       if (living.length === 2 && livingLovers.length === 2) {
         announceVictory('💘 LOVERS VICTORY!', 'The two bound lovers eliminated all rivals and survive together!');
         return true;
       }
 
-      // Village win
       if (livingWolves.length === 0) {
         announceVictory('🎉 VILLAGE WINS!', 'All terrifying werewolves have been wiped out!');
         return true;
       }
 
-      // Werewolves win
       if (livingWolves.length >= livingGood.length) {
         announceVictory('🐺 WEREWOLVES WIN!', 'The pack outnumbers the remaining parish! Darkness claims victory.');
         return true;
@@ -2510,7 +2855,7 @@
     }
 
     /* -------------------------------------------------------------
-     * 17. TABS & MODALS
+     * 18. TABS & MODALS
      * ------------------------------------------------------------- */
     function switchTab(tab) {
       const views = {
@@ -2523,7 +2868,11 @@
 
       Object.values(views).forEach(v => v.classList.add('hidden'));
 
-      if (tab === 'setup') views.setup.classList.remove('hidden');
+      if (tab === 'setup') {
+        views.setup.classList.remove('hidden');
+        const s = getActiveSession();
+        switchSetupSubTab(s ? s.setupSubTab || 'deck' : 'deck');
+      }
       if (tab === 'night') views.night.classList.remove('hidden');
       if (tab === 'dawn') views.dawn.classList.remove('hidden');
       if (tab === 'day') views.day.classList.remove('hidden');
@@ -2567,7 +2916,7 @@
     }
 
     /* -------------------------------------------------------------
-     * 18. APP INITIALIZATION
+     * 19. APP INITIALIZATION
      * ------------------------------------------------------------- */
     window.addEventListener('DOMContentLoaded', () => {
       initThreeAmbience();
